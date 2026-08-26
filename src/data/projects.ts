@@ -126,6 +126,7 @@ export const projects: readonly Project[] = [
       { name: "Vercel", category: "infra" },
     ],
     links: {
+      demo: "https://travel-agency-sooty-mu.vercel.app",
       repo: "https://github.com/byeonsejun/travel_agency",
     },
   },
@@ -381,9 +382,10 @@ export const projects: readonly Project[] = [
       { name: "Redux Toolkit", category: "state" },
       { name: "React Router 6", category: "framework" },
       { name: "TMDB REST API", category: "data" },
-      { name: "Vercel / Netlify", category: "infra" },
+      { name: "Vercel", category: "infra" },
     ],
     links: {
+      demo: "https://seflix.vercel.app",
       repo: "https://github.com/byeonsejun/netflix",
     },
   },
@@ -433,6 +435,7 @@ export const projects: readonly Project[] = [
       { name: "Tailwind CSS 3", category: "styling" },
     ],
     links: {
+      demo: "https://sejun-shop.netlify.app",
       repo: "https://github.com/byeonsejun/shoppy",
     },
   },

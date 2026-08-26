@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import ReactDOM from "react-dom";
 import fontManifest from "@/data/generated/font-manifest.json";
@@ -67,6 +67,21 @@ export const metadata: Metadata = {
     description: "프론트엔드 개발자 변세준의 포트폴리오",
     images: ["/og.png"],
   },
+};
+
+/*
+ * 모바일 브라우저의 주소창·상태바 색.
+ * 이 사이트는 라이트/다크를 모두 지원하므로 한 값으로 고정하면 한쪽에서
+ * 주소창만 다른 색으로 떠 문서가 잘려 보인다. globals.css 의 --background 와
+ * 같은 값을 스킴별로 준다.
+ *
+ * Next 16 에서 themeColor 는 metadata 가 아니라 viewport export 다.
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

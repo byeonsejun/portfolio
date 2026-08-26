@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
 
-import { SITE_URL } from "@/data/site";
-
 /*
  * output: "export" 에서는 라우트 핸들러가 빌드 타임에 한 번만 실행된다는 걸
  * 명시해야 한다. 없으면 "force-static 이 설정되지 않았다" 며 빌드가 멈춘다.
@@ -18,6 +16,12 @@ export const dynamic = "force-static";
  *
  * sitemap 은 선언하지 않는다 — 단일 페이지라 만들지 않았고, 없는 파일을
  * 가리키면 크롤러가 404 를 받는다.
+ *
+ * host 도 선언하지 않는다. 표준 밖의 지시어라 구글·빙은 아예 읽지 않고,
+ * 유일하게 쓰던 얀덱스도 2018 년에 폐기하고 rel=canonical 로 옮겼다. 즉
+ * 정본 도메인을 정하는 힘이 없다. 그런데 파일에 남아 있으면 "정본 선언이
+ * 되어 있다" 는 착각을 부른다 — 실제로 그 착각 때문에 pages.dev 중복 색인을
+ * 한동안 못 봤다. 정본은 <link rel="canonical"> 로만 말한다.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -26,6 +30,5 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/*.txt$",
     },
-    host: SITE_URL,
   };
 }

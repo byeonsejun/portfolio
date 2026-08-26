@@ -138,6 +138,14 @@ export interface TechItem {
 
 export interface ProjectLinks {
   readonly demo?: string;
+  /**
+   * 값이 있으면 demo 링크를 렌더하지 않는다.
+   *
+   * demo 필드를 지우는 대신 이 플래그로 가리는 이유: URL 을 다시 찾을 필요가 없고,
+   * "왜 뺐는지" 가 코드에 남는다. 복구는 이 줄 하나를 지우면 끝난다.
+   * 링크를 영구히 없앨 때만 demo 를 지운다.
+   */
+  readonly demoHiddenReason?: string;
   readonly repo: string;
   /** 상세 회고·기술 문서 (README, 블로그, Notion 등) */
   readonly writeup?: string;

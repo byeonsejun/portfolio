@@ -232,7 +232,8 @@ function LinkRow({ links, name }: { links: ProjectLinks; name: string }) {
       aria-label={`${name} 링크`}
       className="border-rule flex flex-wrap gap-x-6 gap-y-2 border-t pt-6"
     >
-      {links.demo ? (
+      {/* demoHiddenReason 이 있으면 URL 이 있어도 렌더하지 않는다. 사유는 projects.ts 에. */}
+      {links.demo && !links.demoHiddenReason ? (
         <a href={links.demo} className={linkClass}>
           Live Demo
         </a>

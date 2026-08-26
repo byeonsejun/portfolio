@@ -13,6 +13,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "변세준 — Frontend Portfolio",
   description: "프론트엔드 개발자 변세준의 포트폴리오",
+  /*
+   * 파비콘은 app/ 파일 컨벤션(app/icon.*) 대신 public/ + metadata 로 연결한다.
+   *
+   * 두 가지가 이유다.
+   *   1. 컨벤션과 public/favicon.ico 는 둘 다 /favicon.ico 를 만들어 충돌한다.
+   *      하나만 써야 하는데, 브라우저·크롤러는 링크 태그가 없어도 /favicon.ico 를
+   *      무조건 찔러보므로 그 경로에 실물이 있는 편이 안전하다.
+   *   2. 컨벤션은 <link> 에 media 를 붙일 수 없다. 다크 모드용 아이콘을 나중에
+   *      넣으려면 media="(prefers-color-scheme: dark)" 가 필요한데 그 길이 막힌다.
+   *
+   * ICO 하나에 16·32·48·64·128·256 이 전부 들어 있어 브라우저가 알아서 고른다.
+   * apple-touch-icon 은 일부러 넣지 않는다 — 원본이 저해상도라 180x180 을 만들면
+   * 확대본이 된다. 자세한 판단은 커밋 메시지에.
+   */
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

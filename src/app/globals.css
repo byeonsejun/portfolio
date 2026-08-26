@@ -1,0 +1,158 @@
+@import "tailwindcss";
+/* Pretendard 자기호스팅 (scripts/build-fonts.mjs 생성물).
+   패밀리명이 정확히 'Pretendard' 여야 public/diagrams/*.svg 의
+   font-family:Pretendard 하드코딩과 맞는다. */
+@import "../styles/pretendard.generated.css";
+
+/* Tailwind v4 는 기본적으로 `prefers-color-scheme` 으로 dark: 를 판정한다.
+   우리는 토글로 시스템 설정을 덮어쓸 수 있어야 하므로, dark variant 의 기준을
+   <html data-theme="dark"> 로 재정의한다.
+   next-themes 가 system 을 resolve 해서 항상 "light" | "dark" 중 하나를 써주므로
+   이 한 줄이 3단계(light / dark / system) 전부를 커버한다. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #17171a;
+
+  /* 잉크 스케일 — 문서형이라 위계를 색이 아니라 농도로 만든다. */
+  --ink: #17171a; /* 본문 */
+  --ink-2: #52525b; /* 보조 텍스트 */
+  --ink-3: #6b6b73; /* 캡션 · 측정 조건 — 흰 배경 대비 5.28:1 (WCAG AA) */
+  --rule: #e4e4e7; /* 가는 구분선 */
+  --surface: #fafafa; /* 아주 옅은 면 (인용·콜로폰) */
+
+  /*
+   * 사이트의 유일한 유채색. public/diagrams/*.svg 의 앰버와 같은 값이며
+   * 같은 뜻(= 핵심 성과)으로만 쓴다.
+   * 보라(내가 짠 코드) · 틸(외부 시스템)은 다이어그램 전용 — UI 에서 쓰지 말 것.
+   */
+  --accent: #854f0b; /* SVG .asb (light) */
+  --accent-weak: #faeeda; /* SVG .af  (light) */
+
+  /* SVG 가 참조하는 이름과 동일하게 유지할 것. */
+  --font-pretendard: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+
+  --header-h: 2.75rem; /* 모바일 44px */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-h: 3.5rem; /* 데스크톱 56px */
+  }
+}
+
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  --ink: #ededed;
+  --ink-2: #a1a1aa;
+  --ink-3: #8b8b94; /* #0a0a0a 대비 5.86:1 (WCAG AA) */
+  --rule: #27272a;
+  --surface: #141416;
+
+  --accent: #fac775; /* SVG .at  (dark) */
+  --accent-weak: #633806; /* SVG .af  (dark) */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-weak: var(--accent-weak);
+  --font-sans: var(--font-pretendard);
+  /*
+   * mono 스택 끝에 Pretendard 를 붙인다.
+   * Geist Mono 에는 한글 글리프가 없다. 라벨을 mono 로 쓰는데 그 라벨이
+   * "측정 · 구조 · 아키텍처" 처럼 한글이면 그 글자만 시스템 폰트로 떨어진다
+   * (맥은 Apple SD Gothic Neo, 윈도우는 맑은 고딕 — 기기마다 다른 얼굴).
+   * 라틴·숫자는 Geist Mono 가, 한글은 Pretendard 가 받게 해서
+   * 어느 기기에서든 같은 두 폰트로만 렌더되게 한다.
+   * scripts/verify-fonts.mjs 의 (B) 검사가 이걸 지킨다.
+   */
+  --font-mono: var(--font-geist-mono), var(--font-pretendard);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-pretendard);
+
+  /* 한국어는 어절 단위로 끊어야 한다. keep-all 이 없으면 "다음" 이
+     "다 / 음" 으로 잘린다. 대신 긴 URL·식별자가 넘칠 수 있으므로
+     overflow-wrap 으로 그것만 예외 처리한다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* 인라인된 다이어그램 SVG.
+   viewBox 가 680px 기준이라 본문 폭(1024px)에 그대로 맞추면 1.5배로 확대돼
+   다이어그램 글자가 본문보다 커진다. 자연 크기 근처에서 멈춘다. */
+.diagram svg {
+  display: block;
+  width: 100%;
+  max-width: 43rem;
+  height: auto;
+}
+
+/* 고정 헤더 밑으로 제목이 숨지 않도록. 앵커 점프·스크롤 스파이 양쪽에 필요. */
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 1.5rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* 모바일 네비의 가로 스크롤 — 스크롤바는 숨기고 스크롤은 살린다. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── 라이트박스 ───────────────────────────────────────────────
+   <dialog> 는 top-layer 라 사이트 테마와 무관하게 항상 어두운 바탕을 쓴다. */
+.lightbox-full {
+  transition: opacity 200ms ease-out;
+}
+
+.lightbox-spinner {
+  animation: lightbox-spin 700ms linear infinite;
+}
+
+@keyframes lightbox-spin {
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-full {
+    transition: none;
+  }
+  /* 회전 대신 깜빡임으로 대체 — 로딩 중이라는 신호는 남긴다. */
+  .lightbox-spinner {
+    animation: lightbox-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes lightbox-pulse {
+    50% {
+      opacity: 0.3;
+    }
+  }
+}

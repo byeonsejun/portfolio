@@ -1,0 +1,19 @@
+# Cloudflare Pages 캐시 정책.
+# 기본값은 매 요청 재검증(max-age=0, must-revalidate)이라, 파일명에 내용 해시가
+# 붙은 자산만 골라 장기 캐시를 건다. 해시가 곧 버전이므로 stale 이 날 수 없다.
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/derived/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML 은 항상 재검증한다 — 배포 직후 옛 페이지가 남으면 안 된다.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate

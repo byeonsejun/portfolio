@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import ReactDOM from "react-dom";
 import fontManifest from "@/data/generated/font-manifest.json";
+import { SITE_URL } from "@/data/site";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import "./globals.css";
 
@@ -27,7 +28,45 @@ export const metadata: Metadata = {
    * apple-touch-icon 은 일부러 넣지 않는다 — 원본이 저해상도라 180x180 을 만들면
    * 확대본이 된다. 자세한 판단은 커밋 메시지에.
    */
-  icons: { icon: "/favicon.ico" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      /*
+       * 다크 모드용. 로고가 거의 검은 얇은 선에 배경이 투명이라
+       * 다크 탭바(#202124)에서 16px 는 사실상 보이지 않는다.
+       * 형태는 그대로 두고 잉크 색만 사이트의 다크 모드 본문색으로 바꾼 변형이다.
+       * media 를 붙이려면 app/icon 컨벤션이 아니라 metadata 여야 한다.
+       */
+      {
+        url: "/favicon-dark.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: SITE_URL,
+    siteName: "변세준 — Frontend Portfolio",
+    title: "변세준 — Frontend Portfolio",
+    description: "프론트엔드 개발자 변세준의 포트폴리오",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "변세준 — 화면을 하나 더 만드는 것이 아니라, 다음 화면을 더 싸게 만들 수 있게 정리하는 것",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "변세준 — Frontend Portfolio",
+    description: "프론트엔드 개발자 변세준의 포트폴리오",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -24,8 +24,53 @@ import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import sharp from "sharp";
+import { readMp4Meta } from "./lib/mp4-meta.mjs";
 
 const execFileAsync = promisify(execFile);
+
+/*
+ * ffmpeg 산출물(mp4 · poster)은 저장소에 커밋돼 있고 빌드는 그걸 그대로 쓴다.
+ *
+ * 왜: 결과가 원본에만 의존하는데 원본은 거의 안 바뀐다. 그걸 매 빌드마다
+ * 다시 만들려고 배포 CI 에 ffmpeg 를 요구하면, 없는 순간 빌드가 통째로 멈춘다
+ * (Cloudflare Pages 빌더에 ffmpeg 가 없어서 실제로 그렇게 됐다).
+ *
+ * --media 를 주면 강제로 다시 만든다. 원본 GIF·mp4 를 갈아끼웠을 때
+ * 로컬에서 `npm run media` 로 돌리고 결과를 커밋하는 용도다.
+ *
+ * mtime 이 아니라 "파일이 있는지" 로 판단하는 이유: git 은 mtime 을 보존하지
+ * 않는다. clone 하면 원본과 산출물이 같은 시각을 받아 신선도 비교가 무의미해진다.
+ */
+const FORCE_MEDIA = process.argv.includes("--media");
+
+/** ffmpeg 존재 여부. 실제로 필요해지는 순간에만 한 번 확인한다. */
+let ffmpegAvailable = null;
+async function requireFfmpeg(missingFile) {
+  if (ffmpegAvailable === null) {
+    try {
+      await execFileAsync("ffmpeg", ["-version"]);
+      ffmpegAvailable = true;
+    } catch {
+      ffmpegAvailable = false;
+    }
+  }
+  if (!ffmpegAvailable) {
+    throw new Error(
+      `ffmpeg 가 없는데 ${path.relative(ROOT, missingFile)} 도 없다.\n` +
+        `  이 파일은 저장소에 커밋돼 있어야 한다. 원본을 바꿨다면 ffmpeg 가 있는 곳에서\n` +
+        `  \`npm run media\` 를 돌리고 만들어진 mp4 · poster 를 함께 커밋할 것.`,
+    );
+  }
+}
+
+async function exists(f) {
+  try {
+    await stat(f);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const ROOT = process.cwd();
 const SRC_ROOT = path.join(ROOT, "public", "projects");
@@ -181,11 +226,12 @@ function groupSources(entries) {
 
 /* ────────────────────────────── 영상 ────────────────────────────── */
 
-async function gifToMp4(srcAbs, outAbs, srcMtimeMs) {
-  if (await isFresh(outAbs, srcMtimeMs)) {
+async function gifToMp4(srcAbs, outAbs) {
+  if (!FORCE_MEDIA && (await exists(outAbs))) {
     skipped++;
     return false;
   }
+  await requireFfmpeg(outAbs);
   await execFileAsync("ffmpeg", [
     "-y",
     "-i", srcAbs,
@@ -212,11 +258,12 @@ async function gifToMp4(srcAbs, outAbs, srcMtimeMs) {
  * 다만 ffmpeg 내장 mjpeg 인코더는 압축이 나빠서(1280폭 q3 에 220KB) 프레임만
  * PNG 로 뽑고, 실제 인코딩은 sharp 의 mozjpeg 에 맡긴다.
  */
-async function extractPoster(srcAbs, outAbs, srcMtimeMs) {
-  if (await isFresh(outAbs, srcMtimeMs)) {
+async function extractPoster(srcAbs, outAbs) {
+  if (!FORCE_MEDIA && (await exists(outAbs))) {
     skipped++;
     return false;
   }
+  await requireFfmpeg(outAbs);
   // 첫 프레임. 재생 전 화면과 poster 가 일치하는 게 가장 자연스럽다.
   const { stdout } = await execFileAsync(
     "ffmpeg",
@@ -233,22 +280,13 @@ async function extractPoster(srcAbs, outAbs, srcMtimeMs) {
   return true;
 }
 
+/**
+ * 영상 메타데이터. ffprobe 대신 MP4 헤더를 직접 읽는다.
+ * 이 값은 <video> 에 크기를 박아 레이아웃을 예약하는 데만 쓰이는데,
+ * 그것 때문에 빌드가 시스템 ffmpeg 에 매일 이유가 없다.
+ */
 async function probe(file) {
-  const { stdout } = await execFileAsync("ffprobe", [
-    "-v", "error",
-    "-select_streams", "v:0",
-    "-show_entries", "stream=width,height",
-    "-show_entries", "format=duration",
-    "-of", "json",
-    file,
-  ]);
-  const j = JSON.parse(stdout);
-  const s = j.streams?.[0] ?? {};
-  return {
-    width: s.width ?? 0,
-    height: s.height ?? 0,
-    durationSec: Number(j.format?.duration ?? 0),
-  };
+  return readMp4Meta(file);
 }
 
 /* ────────────────────────────── 메인 ────────────────────────────── */
@@ -334,8 +372,8 @@ async function main() {
 
     const mp4Abs = path.join(outDir, `${base}.mp4`);
     const posterAbs = path.join(outDir, `${base}-poster.jpg`);
-    await gifToMp4(srcAbs, mp4Abs, st.mtimeMs);
-    await extractPoster(mp4Abs, posterAbs, st.mtimeMs);
+    await gifToMp4(srcAbs, mp4Abs);
+    await extractPoster(mp4Abs, posterAbs);
 
     const info = await probe(mp4Abs);
     const mp4Bytes = await fileSize(mp4Abs);
@@ -368,7 +406,7 @@ async function main() {
     originalBytes += st.size;
 
     const posterAbs = path.join(outDir, `${base}-poster.jpg`);
-    await extractPoster(srcAbs, posterAbs, st.mtimeMs);
+    await extractPoster(srcAbs, posterAbs);
     const posterBytes = await fileSize(posterAbs);
     derivedBytes += posterBytes;
 

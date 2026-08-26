@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 326" role="img"><title>SHOPPY 서버 상태 캡슐화 구조</title><desc>컴포넌트는 커스텀 훅만 호출하고 React Query가 캐싱과 갱신을 담당하며 fetch 얇은 래퍼가 Firebase REST를 직접 제어한다</desc>
+<style>
+.bx{stroke-width:.5}
+.pf{fill:#EEEDFE;stroke:#534AB7}.pt{fill:#3C3489}.ps{fill:#534AB7}
+.tf{fill:#E1F5EE;stroke:#0F6E56}.tt{fill:#085041}.tsb{fill:#0F6E56}
+.af{fill:#FAEEDA;stroke:#854F0B}.at{fill:#633806}.asb{fill:#854F0B}
+.ln{stroke:#73726c;stroke-width:1.5;fill:none}
+.dsh{stroke:#73726c;stroke-width:.5;fill:none;stroke-dasharray:4 4}
+.thin{stroke:#73726c;stroke-width:.5;fill:none}
+.lbl{fill:#73726c}
+text{font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+.t14{font-size:14px;font-weight:500}.t12{font-size:12px;font-weight:400}
+:root[data-theme="dark"] .pf{fill:#3C3489;stroke:#AFA9EC}
+:root[data-theme="dark"] .pt{fill:#CECBF6}
+:root[data-theme="dark"] .ps{fill:#AFA9EC}
+:root[data-theme="dark"] .tf{fill:#085041;stroke:#5DCAA5}
+:root[data-theme="dark"] .tt{fill:#9FE1CB}
+:root[data-theme="dark"] .tsb{fill:#5DCAA5}
+:root[data-theme="dark"] .af{fill:#633806;stroke:#EF9F27}
+:root[data-theme="dark"] .at{fill:#FAC775}
+:root[data-theme="dark"] .asb{fill:#EF9F27}
+:root[data-theme="dark"] .ln,:root[data-theme="dark"] .dsh,:root[data-theme="dark"] .thin{stroke:#9c9a92}
+:root[data-theme="dark"] .lbl{fill:#9c9a92}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme]) .pf{fill:#3C3489;stroke:#AFA9EC}
+:root:not([data-theme]) .pt{fill:#CECBF6}
+:root:not([data-theme]) .ps{fill:#AFA9EC}
+:root:not([data-theme]) .tf{fill:#085041;stroke:#5DCAA5}
+:root:not([data-theme]) .tt{fill:#9FE1CB}
+:root:not([data-theme]) .tsb{fill:#5DCAA5}
+:root:not([data-theme]) .af{fill:#633806;stroke:#EF9F27}
+:root:not([data-theme]) .at{fill:#FAC775}
+:root:not([data-theme]) .asb{fill:#EF9F27}
+:root:not([data-theme]) .ln,:root:not([data-theme]) .dsh,:root:not([data-theme]) .thin{stroke:#9c9a92}
+:root:not([data-theme]) .lbl{fill:#9c9a92}
+}
+</style>
+<defs><marker id="ah-shoppy-state" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g><rect x="48" y="46" width="170" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="133" y="64" text-anchor="middle" dominant-baseline="central">컴포넌트</text><text class="t12 ps" x="133" y="84" text-anchor="middle" dominant-baseline="central">useCart · useProducts</text></g>
+<line x1="220" y1="74" x2="251" y2="74" class="ln" marker-end="url(#ah-shoppy-state)"/>
+<g><rect x="255" y="46" width="170" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="340" y="64" text-anchor="middle" dominant-baseline="central">React Query 훅</text><text class="t12 ps" x="340" y="84" text-anchor="middle" dominant-baseline="central">캐싱 · 갱신 · 로딩</text></g>
+<line x1="427" y1="74" x2="458" y2="74" class="ln" marker-end="url(#ah-shoppy-state)"/>
+<g><rect x="462" y="46" width="170" height="56" rx="8" class="bx tf"/><text class="t14 tt" x="547" y="64" text-anchor="middle" dominant-baseline="central">Firebase REST</text><text class="t12 tsb" x="547" y="84" text-anchor="middle" dominant-baseline="central">fetch 얇은 래퍼</text></g>
+<line x1="340" y1="146" x2="340" y2="106" class="ln" marker-end="url(#ah-shoppy-state)"/>
+<g><rect x="255" y="150" width="170" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="340" y="168" text-anchor="middle" dominant-baseline="central">enabled 가드</text><text class="t12 ps" x="340" y="188" text-anchor="middle" dominant-baseline="central">비로그인 요청 차단</text></g>
+<g><rect x="180" y="230" width="320" height="56" rx="8" class="bx af"/><text class="t14 at" x="340" y="248" text-anchor="middle" dominant-baseline="central">자체 디자인 시스템 Refined Mono</text><text class="t12 asb" x="340" y="268" text-anchor="middle" dominant-baseline="central">ink · paper · accent 토큰으로 통일</text></g>
+</svg>

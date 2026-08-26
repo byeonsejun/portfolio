@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 266" role="img"><title>NEXTOUR FSD 5-레이어 단방향 의존성</title><desc>app, widgets, features, entities, shared 순으로 상위 레이어만 하위 레이어를 import하며 barrel index.ts와 ESLint 규칙이 이를 강제한다</desc>
+<style>
+.bx{stroke-width:.5}
+.pf{fill:#EEEDFE;stroke:#534AB7}.pt{fill:#3C3489}.ps{fill:#534AB7}
+.tf{fill:#E1F5EE;stroke:#0F6E56}.tt{fill:#085041}.tsb{fill:#0F6E56}
+.af{fill:#FAEEDA;stroke:#854F0B}.at{fill:#633806}.asb{fill:#854F0B}
+.ln{stroke:#73726c;stroke-width:1.5;fill:none}
+.dsh{stroke:#73726c;stroke-width:.5;fill:none;stroke-dasharray:4 4}
+.thin{stroke:#73726c;stroke-width:.5;fill:none}
+.lbl{fill:#73726c}
+text{font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+.t14{font-size:14px;font-weight:500}.t12{font-size:12px;font-weight:400}
+:root[data-theme="dark"] .pf{fill:#3C3489;stroke:#AFA9EC}
+:root[data-theme="dark"] .pt{fill:#CECBF6}
+:root[data-theme="dark"] .ps{fill:#AFA9EC}
+:root[data-theme="dark"] .tf{fill:#085041;stroke:#5DCAA5}
+:root[data-theme="dark"] .tt{fill:#9FE1CB}
+:root[data-theme="dark"] .tsb{fill:#5DCAA5}
+:root[data-theme="dark"] .af{fill:#633806;stroke:#EF9F27}
+:root[data-theme="dark"] .at{fill:#FAC775}
+:root[data-theme="dark"] .asb{fill:#EF9F27}
+:root[data-theme="dark"] .ln,:root[data-theme="dark"] .dsh,:root[data-theme="dark"] .thin{stroke:#9c9a92}
+:root[data-theme="dark"] .lbl{fill:#9c9a92}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme]) .pf{fill:#3C3489;stroke:#AFA9EC}
+:root:not([data-theme]) .pt{fill:#CECBF6}
+:root:not([data-theme]) .ps{fill:#AFA9EC}
+:root:not([data-theme]) .tf{fill:#085041;stroke:#5DCAA5}
+:root:not([data-theme]) .tt{fill:#9FE1CB}
+:root:not([data-theme]) .tsb{fill:#5DCAA5}
+:root:not([data-theme]) .af{fill:#633806;stroke:#EF9F27}
+:root:not([data-theme]) .at{fill:#FAC775}
+:root:not([data-theme]) .asb{fill:#EF9F27}
+:root:not([data-theme]) .ln,:root:not([data-theme]) .dsh,:root:not([data-theme]) .thin{stroke:#9c9a92}
+:root:not([data-theme]) .lbl{fill:#9c9a92}
+}
+</style>
+<defs><marker id="ah-nextour-fsd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g><rect x="42" y="50" width="108" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="96" y="68" text-anchor="middle" dominant-baseline="central">app</text><text class="t12 ps" x="96" y="88" text-anchor="middle" dominant-baseline="central">라우팅</text></g>
+<line x1="152" y1="78" x2="176" y2="78" class="ln" marker-end="url(#ah-nextour-fsd)"/>
+<g><rect x="164" y="50" width="108" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="218" y="68" text-anchor="middle" dominant-baseline="central">widgets</text><text class="t12 ps" x="218" y="88" text-anchor="middle" dominant-baseline="central">13 슬라이스</text></g>
+<line x1="274" y1="78" x2="298" y2="78" class="ln" marker-end="url(#ah-nextour-fsd)"/>
+<g><rect x="286" y="50" width="108" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="340" y="68" text-anchor="middle" dominant-baseline="central">features</text><text class="t12 ps" x="340" y="88" text-anchor="middle" dominant-baseline="central">20 슬라이스</text></g>
+<line x1="396" y1="78" x2="420" y2="78" class="ln" marker-end="url(#ah-nextour-fsd)"/>
+<g><rect x="408" y="50" width="108" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="462" y="68" text-anchor="middle" dominant-baseline="central">entities</text><text class="t12 ps" x="462" y="88" text-anchor="middle" dominant-baseline="central">10 슬라이스</text></g>
+<line x1="518" y1="78" x2="542" y2="78" class="ln" marker-end="url(#ah-nextour-fsd)"/>
+<g><rect x="530" y="50" width="108" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="584" y="68" text-anchor="middle" dominant-baseline="central">shared</text><text class="t12 ps" x="584" y="88" text-anchor="middle" dominant-baseline="central">도메인 무지</text></g>
+<line x1="340" y1="106" x2="340" y2="130" class="thin"/><path d="M245 130 L445 130" class="thin"/><line x1="245" y1="130" x2="245" y2="166" class="ln" marker-end="url(#ah-nextour-fsd)"/><line x1="445" y1="130" x2="445" y2="166" class="ln" marker-end="url(#ah-nextour-fsd)"/>
+<g><rect x="160" y="170" width="170" height="56" rx="8" class="bx tf"/><text class="t14 tt" x="245" y="188" text-anchor="middle" dominant-baseline="central">barrel index.ts</text><text class="t12 tsb" x="245" y="208" text-anchor="middle" dominant-baseline="central">공개 API만 노출</text></g>
+<g><rect x="360" y="170" width="170" height="56" rx="8" class="bx tf"/><text class="t14 tt" x="445" y="188" text-anchor="middle" dominant-baseline="central">ESLint 규칙</text><text class="t12 tsb" x="445" y="208" text-anchor="middle" dominant-baseline="central">깊은 경로 차단</text></g>
+</svg>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 288" role="img"><title>NEXTOUR 3-Phase 환불 saga</title><desc>Phase 1 DB 트랜잭션에서 멱등 게이트와 예약, Phase 2에서 트랜잭션 바깥의 외부 PG 호출, Phase 3 DB 트랜잭션에서 정산이 이뤄지며 PG 실패 시 PENDING으로 적재해 cron worker가 재시도한다</desc>
+<style>
+.bx{stroke-width:.5}
+.pf{fill:#EEEDFE;stroke:#534AB7}.pt{fill:#3C3489}.ps{fill:#534AB7}
+.tf{fill:#E1F5EE;stroke:#0F6E56}.tt{fill:#085041}.tsb{fill:#0F6E56}
+.af{fill:#FAEEDA;stroke:#854F0B}.at{fill:#633806}.asb{fill:#854F0B}
+.ln{stroke:#73726c;stroke-width:1.5;fill:none}
+.dsh{stroke:#73726c;stroke-width:.5;fill:none;stroke-dasharray:4 4}
+.thin{stroke:#73726c;stroke-width:.5;fill:none}
+.lbl{fill:#73726c}
+text{font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+.t14{font-size:14px;font-weight:500}.t12{font-size:12px;font-weight:400}
+:root[data-theme="dark"] .pf{fill:#3C3489;stroke:#AFA9EC}
+:root[data-theme="dark"] .pt{fill:#CECBF6}
+:root[data-theme="dark"] .ps{fill:#AFA9EC}
+:root[data-theme="dark"] .tf{fill:#085041;stroke:#5DCAA5}
+:root[data-theme="dark"] .tt{fill:#9FE1CB}
+:root[data-theme="dark"] .tsb{fill:#5DCAA5}
+:root[data-theme="dark"] .af{fill:#633806;stroke:#EF9F27}
+:root[data-theme="dark"] .at{fill:#FAC775}
+:root[data-theme="dark"] .asb{fill:#EF9F27}
+:root[data-theme="dark"] .ln,:root[data-theme="dark"] .dsh,:root[data-theme="dark"] .thin{stroke:#9c9a92}
+:root[data-theme="dark"] .lbl{fill:#9c9a92}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme]) .pf{fill:#3C3489;stroke:#AFA9EC}
+:root:not([data-theme]) .pt{fill:#CECBF6}
+:root:not([data-theme]) .ps{fill:#AFA9EC}
+:root:not([data-theme]) .tf{fill:#085041;stroke:#5DCAA5}
+:root:not([data-theme]) .tt{fill:#9FE1CB}
+:root:not([data-theme]) .tsb{fill:#5DCAA5}
+:root:not([data-theme]) .af{fill:#633806;stroke:#EF9F27}
+:root:not([data-theme]) .at{fill:#FAC775}
+:root:not([data-theme]) .asb{fill:#EF9F27}
+:root:not([data-theme]) .ln,:root:not([data-theme]) .dsh,:root:not([data-theme]) .thin{stroke:#9c9a92}
+:root:not([data-theme]) .lbl{fill:#9c9a92}
+}
+</style>
+<defs><marker id="ah-nextour-saga" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="48" y="50" width="175" height="110" rx="12" class="dsh"/><text class="t12 lbl" x="135" y="70" text-anchor="middle" dominant-baseline="central">Phase 1 · DB Tx</text>
+<g><rect x="60" y="88" width="151" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="135" y="106" text-anchor="middle" dominant-baseline="central">멱등 게이트</text><text class="t12 ps" x="135" y="126" text-anchor="middle" dominant-baseline="central">원장 조건부 차감</text></g>
+<line x1="225" y1="116" x2="251" y2="116" class="ln" marker-end="url(#ah-nextour-saga)"/>
+<rect x="253" y="50" width="175" height="110" rx="12" class="dsh"/><text class="t12 lbl" x="340" y="70" text-anchor="middle" dominant-baseline="central">Phase 2 · 트랜잭션 밖</text>
+<g><rect x="265" y="88" width="151" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="340" y="106" text-anchor="middle" dominant-baseline="central">외부 PG 호출</text><text class="t12 ps" x="340" y="126" text-anchor="middle" dominant-baseline="central">Idempotency-Key</text></g>
+<line x1="430" y1="116" x2="456" y2="116" class="ln" marker-end="url(#ah-nextour-saga)"/>
+<rect x="458" y="50" width="175" height="110" rx="12" class="dsh"/><text class="t12 lbl" x="545" y="70" text-anchor="middle" dominant-baseline="central">Phase 3 · DB Tx</text>
+<g><rect x="470" y="88" width="151" height="56" rx="8" class="bx pf"/><text class="t14 pt" x="545" y="106" text-anchor="middle" dominant-baseline="central">원장 정산</text><text class="t12 ps" x="545" y="126" text-anchor="middle" dominant-baseline="central">이벤트 적재</text></g>
+<line x1="300" y1="162" x2="300" y2="192" class="ln" marker-end="url(#ah-nextour-saga)"/><line x1="382" y1="192" x2="382" y2="162" class="ln" marker-end="url(#ah-nextour-saga)"/>
+<g><rect x="253" y="196" width="175" height="56" rx="8" class="bx af"/><text class="t14 at" x="340" y="214" text-anchor="middle" dominant-baseline="central">실패 시 PENDING</text><text class="t12 asb" x="340" y="234" text-anchor="middle" dominant-baseline="central">cron worker 재시도</text></g>
+</svg>

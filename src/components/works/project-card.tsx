@@ -234,11 +234,21 @@ function LinkRow({ links, name }: { links: ProjectLinks; name: string }) {
     >
       {/* demoHiddenReason 이 있으면 URL 이 있어도 렌더하지 않는다. 사유는 projects.ts 에. */}
       {links.demo && !links.demoHiddenReason ? (
-        <a href={links.demo} className={linkClass}>
+        <a
+          href={links.demo}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
           Live Demo
         </a>
       ) : null}
-      <a href={links.repo} className={linkClass}>
+      <a
+        href={links.repo}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={linkClass}
+      >
         Repository
       </a>
       {links.writeup ? (

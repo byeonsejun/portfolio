@@ -68,26 +68,26 @@ export const projects: readonly Project[] = [
       {
         kind: "image",
         src: "/projects/travel-agency/search.png",
-        alt: "AI 자연어 검색 결과",
-        caption: "검색 — AI 자연어 하이브리드 랭킹 결과",
+        alt: "‘온천’ 검색 결과",
+        caption: "검색 결과 — 하이브리드 랭킹 · 조건 좁히기 칩",
       },
       {
         kind: "image",
         src: "/projects/travel-agency/pdp.png",
         alt: "상품 상세(PDP)",
-        caption: "상품 상세(PDP) — 일정·출발일·실시간 좌석",
+        caption: "상품 상세(PDP) — AI 추천 포인트 · 기준 가격",
       },
       {
         kind: "image",
         src: "/projects/travel-agency/checkout.png",
-        alt: "체크아웃",
-        caption: "체크아웃 — 2-phase 결제 플로우",
+        alt: "체크아웃 예약 정보 입력 화면",
+        caption: "체크아웃 — 출발일·잔여 좌석 확인 · 인원/여행자 정보 입력",
       },
       {
         kind: "image",
         src: "/projects/travel-agency/admin-dashboard.png",
         alt: "관리자 대시보드",
-        caption: "관리자 대시보드 — 매출·점유율·취소율",
+        caption: "관리자 대시보드 — 순매출·취소율·좌석 점유율 · Web Vitals p75",
       },
     ],
     diagrams: [
@@ -278,8 +278,8 @@ export const projects: readonly Project[] = [
       },
       {
         kind: "video",
-        src: "/projects/date/05-restaurants-panel.mp4",
-        caption: "추천 식당 UI (펼침/리스트)",
+        src: "/projects/date/05-culture-spot-detail.mp4",
+        caption: "문화공간 마커 클릭 · 장소 상세 카드",
       },
       {
         kind: "video",
@@ -372,7 +372,7 @@ export const projects: readonly Project[] = [
         kind: "image",
         src: "/projects/netflix/04-detail.png",
         alt: "상세 페이지",
-        caption: "상세 · 예고편 모달 · 리뷰/추천 탭",
+        caption: "상세 — 예고편 버튼 · 리뷰(2)/추천(20) 탭",
       },
     ],
     diagrams: [
@@ -420,7 +420,7 @@ export const projects: readonly Project[] = [
         kind: "image",
         src: "/projects/shoppy/preview-shop.png",
         alt: "상품 목록 화면",
-        caption: "상품 목록 (검색·정렬)",
+        caption: "상품 목록 — 정렬 · BEST/HOT/NEW 배지",
       },
     ],
     diagrams: [

@@ -17,12 +17,12 @@
 ### metrics
 | label | value | note |
 |---|---|---|
-| ADR | 61건 | 0001–0061, 결번 없음 |
+| ADR | 62건 | 0001–0062, 결번 없음 |
 | 결제 | 2-phase | 좌석 선점 → PG 승인 → DB 확정 |
 | 환불 | 3-phase saga | 외부 IO를 DB 트랜잭션 밖으로 격리 |
 | 멱등성 | 3중 | Idempotency-Key · RefundJob 게이트 · providerEventId |
 | 아키텍처 | FSD 5-레이어 | app · widgets 13 · features 20 · entities 10 · shared |
-| 테스트 | 1,324건 | 165개 파일 · 2026.08 기준 |
+| 테스트 | 1,417건 | 176개 파일 · 2026.10 기준 |
 | 성능 계측 | 자체 RUM | Web Vitals p75 · PostgreSQL percentile_cont |
 
 ### troubleshooting — 외부 PG 호출을 DB 트랜잭션 밖으로
@@ -119,30 +119,29 @@ Auth.js v5로 마이그레이션하던 중, Sanity에 유저 문서가 계속 �
 ### metrics
 | label | value | baseline | note |
 |---|---|---|---|
-| API 응답 | 9,935 bytes | 314,546 bytes | 식당 추천 5건 기준 · 96.84% 절감 |
+| API 응답 | 9,935 bytes | 314,546 bytes | 식당 추천 5건 기준 · base64 내장 방식과의 비교 측정(314,546 대 9,935 bytes) |
 | Accessibility | 96 | | Lighthouse |
 | POI | 2,608건 | | 한 · 영 · 일 · 중(간체) |
 | 플랫폼 | Web + Native | | 동일 /api 계약 공유 |
-| ADR | 4건 | | |
+| ADR | 5건 | | |
 
-### troubleshooting — 응답에 이미지를 담으면서 페이로드가 폭증
+### troubleshooting — 응답에 이미지를 담지 않는 설계와 비교 측정
 
 **Situation**
-식당 추천 API 응답이 5건 기준 314,546 bytes에 달했습니다.
-목록 하나 여는 데 300KB가 넘게 오갔습니다.
+식당 추천 API는 장소 사진을 함께 내려줘야 했습니다.
+사진을 응답에 직접 담으면 목록 하나 여는 데 얼마가 오가는지 확인할 필요가 있었습니다.
 
 **Cause**
-장소 사진을 base64로 인코딩해 JSON 안에 직접 넣고 있었습니다.
-base64는 원본보다 약 33% 커지는 데다, 응답 전체가 하나의 JSON이라
-이미지가 다 도착할 때까지 목록을 그릴 수 없었습니다.
+사진을 base64로 인코딩해 JSON 안에 넣으면 원본보다 약 33% 커지는 데다,
+응답 전체가 하나의 JSON이라 이미지가 다 도착할 때까지 목록을 그릴 수 없습니다.
 
 **Solution**
 응답에는 이미지 URL만 담고, 실제 이미지는 브라우저가 별도로 받아가게 했습니다.
 텍스트 정보가 먼저 도착해 목록이 즉시 그려지고, 이미지는 뒤따라 채워집니다.
 
 **Outcome**
-9,935 bytes로 줄었습니다. 96.84% 절감입니다.
-이미지 로딩이 목록 렌더를 막지 않는 구조가 되었습니다.
+base64 내장 방식과의 비교 측정(314,546 대 9,935 bytes)에서 96.84% 작았습니다.
+이미지 로딩이 목록 렌더를 막지 않는 구조입니다.
 
 ---
 

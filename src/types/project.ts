@@ -71,7 +71,7 @@ export interface Metric {
   /**
    * 측정값인지 구조 서술인지.
    *
-   *   measured    실제로 잰 수치. "Lighthouse 93", "1,324건", "9,935 bytes"
+   *   measured    실제로 잰 수치. "Lighthouse 93", "1,000건", "9,935 bytes"
    *   structural  설계·구조를 서술하는 값. "3-phase saga", "FSD 5-레이어"
    *
    * 둘 다 배지로 나가지만 시각적 무게가 같으면 안 된다 —

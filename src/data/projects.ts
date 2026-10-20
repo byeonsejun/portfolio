@@ -23,9 +23,9 @@ export const projects: readonly Project[] = [
     metrics: [
       {
         label: "ADR",
-        value: "61건",
+        value: "62건",
         kind: "measured",
-        note: "0001–0061, 결번 없음",
+        note: "0001–0062, 결번 없음",
       },
       {
         label: "결제",
@@ -53,9 +53,9 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "1,324건",
+        value: "1,417건",
         kind: "measured",
-        note: "165개 파일 · 2026.08 기준",
+        note: "176개 파일 · 2026.10 기준",
       },
       {
         label: "성능 계측",
@@ -248,7 +248,7 @@ export const projects: readonly Project[] = [
         baseline: "314,546 bytes",
         kind: "measured",
         tone: "positive",
-        note: "식당 추천 5건 기준 · 96.84% 절감",
+        note: "식당 추천 5건 기준 · base64 내장 방식과의 비교 측정(314,546 대 9,935 bytes)",
       },
       {
         label: "Accessibility",
@@ -268,7 +268,7 @@ export const projects: readonly Project[] = [
         kind: "structural",
         note: "동일 /api 계약 공유",
       },
-      { label: "ADR", value: "4건", kind: "measured" },
+      { label: "ADR", value: "5건", kind: "measured" },
     ],
     screens: [
       {
@@ -306,15 +306,15 @@ export const projects: readonly Project[] = [
       },
     ],
     troubleshooting: {
-      title: "응답에 이미지를 담으면서 페이로드가 폭증",
+      title: "응답에 이미지를 담지 않는 설계와 비교 측정",
       situation:
-        "식당 추천 API 응답이 5건 기준 314,546 bytes에 달했습니다. 목록 하나 여는 데 300KB가 넘게 오갔습니다.",
+        "식당 추천 API는 장소 사진을 함께 내려줘야 했습니다. 사진을 응답에 직접 담으면 목록 하나 여는 데 얼마가 오가는지 확인할 필요가 있었습니다.",
       cause:
-        "장소 사진을 base64로 인코딩해 JSON 안에 직접 넣고 있었습니다. base64는 원본보다 약 33% 커지는 데다, 응답 전체가 하나의 JSON이라 이미지가 다 도착할 때까지 목록을 그릴 수 없었습니다.",
+        "사진을 base64로 인코딩해 JSON 안에 넣으면 원본보다 약 33% 커지는 데다, 응답 전체가 하나의 JSON이라 이미지가 다 도착할 때까지 목록을 그릴 수 없습니다.",
       solution:
         "응답에는 이미지 URL만 담고, 실제 이미지는 브라우저가 별도로 받아가게 했습니다. 텍스트 정보가 먼저 도착해 목록이 즉시 그려지고, 이미지는 뒤따라 채워집니다.",
       outcome:
-        "9,935 bytes로 줄었습니다. 96.84% 절감입니다. 이미지 로딩이 목록 렌더를 막지 않는 구조가 되었습니다.",
+        "base64 내장 방식과의 비교 측정(314,546 대 9,935 bytes)에서 96.84% 작았습니다. 이미지 로딩이 목록 렌더를 막지 않는 구조입니다.",
     },
     techStack: [
       { name: "Next.js 16 (App Router)", category: "framework" },

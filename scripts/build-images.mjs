@@ -106,6 +106,8 @@ const THUMB_CROPS = {
   // 9%: "QUIET ESSENTIALS" 헤드라인 + 서브텍스트 + SHOP NOW 버튼이 온전히 들어간다.
   //     0% 는 헤드라인을, 6% 는 CTA 버튼을 자른다.
   "shoppy/preview-home.png": 0.09,
+  // 0%: 남색 헤더 + 검색창 + 복권 칩 + 지도 윗부분. 바텀시트는 아래라 잘려도 무방하다.
+  "meisho/mobile-home.png": 0.0,
 };
 
 /** GIF → mp4 로 바꿀 대상. 확대는 막을 것이므로 파생 정지 이미지는 만들지 않는다. */

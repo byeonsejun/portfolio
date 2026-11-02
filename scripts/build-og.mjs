@@ -48,7 +48,7 @@ async function logoDataUri() {
 const NAME = "변세준";
 const ROLE = "프론트엔드 개발자";
 const STATEMENT = ["화면을 하나 더 만드는 것이 아니라,", "다음 화면을 더 싸게 만들 수 있게 정리하는 것"];
-const PROJECTS = ["Nextour", "명당재팬", "Seoul Date", "SEFLIX", "SHOPPY"];
+const PROJECTS = ["Nextour", "명당재팬", "Seoul Date", "SEFLIX", "LUMEN"];
 const SITE = "sejunb.com";
 /** 대표 문장이 몇 줄로 떨어져야 하는지. 아래 검사의 기준. */
 const STATEMENT_LEN = STATEMENT.length;

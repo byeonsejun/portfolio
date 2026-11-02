@@ -146,7 +146,11 @@ export interface ProjectLinks {
    * 링크를 영구히 없앨 때만 demo 를 지운다.
    */
   readonly demoHiddenReason?: string;
-  readonly repo: string;
+  /**
+   * 비공개 저장소면 생략한다. 링크가 404 로 떨어지는 것보다 없는 게 낫다.
+   * 저장소를 공개하면 이 필드만 채우면 된다.
+   */
+  readonly repo?: string;
   /** 상세 회고·기술 문서 (README, 블로그, Notion 등) */
   readonly writeup?: string;
 }
@@ -159,6 +163,11 @@ export interface Project {
   readonly name: string;
   /** 한 줄 정의. 카드 제목 바로 밑. */
   readonly tagline: string;
+  /**
+   * 역할 분담. 혼자 다 짜지 않은 프로젝트에만 쓴다 — tagline 밑에 한 줄로 나간다.
+   * 면접관이 "이걸 직접 구현했나"를 추측하게 두지 않으려는 것이다.
+   */
+  readonly role?: string;
   /** 카드 상단 대표 스크린샷 */
   readonly cover: ImageRef;
   readonly metrics: readonly Metric[];

@@ -15,6 +15,8 @@ export const projects: readonly Project[] = [
     slug: "travel-agency",
     name: "Nextour",
     tagline: "AI가 찾아주는 맞춤형 패키지 여행 예약 플랫폼",
+    // 저장소 README 의 "코드는 AI가, 판단은 내가" 와 같은 입장. 결정 회고는 links.writeup.
+    role: "판단 · 의사결정은 직접, 구현의 상당 부분은 Claude Code",
     order: 1,
     cover: {
       src: "/projects/travel-agency/home.png",
@@ -105,15 +107,21 @@ export const projects: readonly Project[] = [
       },
     ],
     troubleshooting: {
-      title: "외부 PG 호출을 DB 트랜잭션 밖으로",
+      title: "AI가 찾은 1등 가중치를 운영에 넣지 않은 이유",
       situation:
-        "환불은 자사 DB와 외부 PG(토스)에 걸친 분산 트랜잭션입니다. PG 호출과 DB 갱신이 한 트랜잭션 안에 있으면, PG는 성공했는데 DB 커밋이 실패하는 순간 고객 돈은 나갔지만 시스템은 환불을 모르는 상태가 됩니다.",
+        "검색 점수는 벡터 0.5 · 키워드 0.2 · 지역 0.2 · 테마 0.1의 가중합입니다. AI로 가중치 조합 286개를 전부 평가하는 nDCG 측정 도구를 만들었고, 1등 설정으로 바꾸는 건 상수 한 줄이었습니다.",
       cause:
-        "외부 네트워크 호출이 트랜잭션 안에 있으면 두 가지가 동시에 문제가 됩니다. PG 응답을 기다리는 수 초 동안 DB 락이 유지되고, 실패 지점에 따라 결과가 갈립니다.",
+        "1등을 믿을 근거가 빈약했습니다. 평가 쿼리 10개는 대부분 nDCG 1.000으로 포화돼 우열을 가리지 못했고, 1등의 이득은 +0.0099(상대 1.1%)로 측정 노이즈 수준이었습니다. 게다가 공동 1등 4개가 모두 벡터 가중치를 0.1 이하로 굶긴 설정이었습니다. 작은 평가셋에 과적합된 신호로 판단했습니다.",
       solution:
-        "Phase를 셋으로 쪼갰습니다. Phase 1(DB Tx)에서 멱등 게이트를 통과시키고 원장을 조건부 차감해 예약합니다. Phase 2는 트랜잭션 밖에서 PG를 호출합니다. Phase 3(DB Tx)에서 정산하고 이벤트를 적재합니다. PG 호출이 실패하면 RefundJob을 PENDING으로 적재하고 지수 백오프로 cron worker가 재시도합니다. 그동안에도 예약 상태는 무결성을 유지합니다.",
+        "가중치는 바꾸지 않고 측정 도구를 넓히기로 결정했습니다. 상품 20건이 실제로 지원하는 차원만 자극하는 쿼리 45개를 다섯 유형(의미 · 지역 · 테마 · 조건 · 적대적)으로 나눠 다시 쟀습니다.",
       outcome:
-        "락 윈도우가 마이크로초 단위로 줄었고, PG 실패가 데이터 불일치로 이어지지 않습니다. 3중 멱등성으로 이중 환불도 차단됩니다. (ADR-0003)",
+        "벡터를 굶긴 공동 1등은 4건에서 0건으로 사라졌습니다. \"1등\"은 작은 셋에 과적합된 신호였습니다. 대신 의미 검색 유형에서 0.61이라는 약점이 드러났는데, 교정은 실제 트래픽이 생긴 뒤 온라인 지표로 하기로 하고 ADR에 남겼습니다. 운영 코드는 한 줄도 바뀌지 않았습니다.",
+      references: [
+        {
+          label: "ADR-0054",
+          href: "https://github.com/byeonsejun/travel_agency/blob/main/docs/superpowers/adr/0054-search-weight-tuning-deferred.md",
+        },
+      ],
     },
     techStack: [
       { name: "Next.js 16 (App Router)", category: "framework" },
@@ -128,106 +136,155 @@ export const projects: readonly Project[] = [
     links: {
       demo: "https://travel-agency-sooty-mu.vercel.app",
       repo: "https://github.com/byeonsejun/travel_agency",
+      writeup:
+        "https://github.com/byeonsejun/travel_agency/blob/main/docs/engineering-judgment.md",
     },
   },
 
   {
-    slug: "junsgram",
-    name: "Junsgram",
+    slug: "meisho-japan",
+    name: "명당재팬",
     tagline:
-      "레거시 Next.js 13 코드베이스를 Next.js 16 / React 19 / Auth.js v5로 전면 현대화한 사진 공유 앱",
+      "일본 복권 1등 판매점(명당) 157곳을 지도에 모은, 한국인 여행자용 정적 사이트",
+    role: "제품 정의 · 의사결정 · 검수는 직접, 구현은 Claude Code",
     order: 2,
     cover: {
-      src: "/projects/junsgram/feed.png",
-      alt: "Junsgram 피드 화면",
+      src: "/projects/meisho/home.png",
+      alt: "명당재팬 홈 — 도쿄 지도와 내 주변 명당 목록",
     },
     metrics: [
       {
-        label: "Next.js",
-        value: "16",
-        baseline: "13.5",
+        label: "판매점",
+        value: "157곳",
         kind: "measured",
-        tone: "positive",
-        note: "App Router · Turbopack",
+        note: "지도 핀 100% · 자동 73 · 수동 확인 84",
       },
       {
-        label: "React",
-        value: "19",
-        baseline: "18",
+        label: "하드코딩 색",
+        value: "0곳",
+        baseline: "80곳",
         kind: "measured",
         tone: "positive",
+        note: "리디자인 PR #2 · 토큰 정의 파일 밖 기준",
       },
       {
-        label: "인증",
-        value: "Auth.js v5",
-        baseline: "NextAuth v4",
+        label: "단위 테스트",
+        value: "585건",
+        kind: "measured",
+        note: "Vitest · 파서는 실제 기사 HTML fixture",
+      },
+      {
+        label: "E2E",
+        value: "60건",
+        kind: "measured",
+        note: "Playwright · CLS · 출처 정적 렌더 · 글꼴 로딩 순서 회귀 테스트 포함 · 3건은 조건부 skip",
+      },
+      {
+        label: "CLS (데스크톱)",
+        value: "0.0001",
+        baseline: "0.19",
         kind: "measured",
         tone: "positive",
+        note: "모바일 0.106 → 0.0006 · 데스크톱 Performance 88–90 → 97–99 · PR #4–#7",
       },
-      { label: "단위 테스트", value: "20건", kind: "measured", note: "Vitest" },
-      { label: "E2E", value: "5건", kind: "measured", note: "Playwright" },
       {
-        label: "CI",
-        value: "전 PR 게이팅",
+        label: "지도 첫 화면 데이터",
+        value: "503KB",
+        baseline: "751KB",
+        kind: "measured",
+        tone: "positive",
+        note: "시작 줌 11 → 10 · 타일 6장 → 2장 · 느린 모바일에서 지도 완성 1.5초 단축 · PR #7",
+      },
+      {
+        label: "Lighthouse",
+        value: "100 · 100 · 100",
+        kind: "measured",
+        note: "접근성 · 권장사항 · SEO · 모바일/데스크톱 11회 모두 · 13.4.1 · 2026.11.02",
+      },
+      {
+        label: "운영 비용",
+        value: "0원",
+        kind: "measured",
+        note: "유료 API · API 키 없음",
+      },
+      {
+        label: "핀 규칙",
+        value: "fail-closed",
         kind: "structural",
-        note: "lint · typecheck · test · build",
+        note: "번지 수준 일치만 자동 · 나머지는 확인 대기",
+      },
+      {
+        label: "수집",
+        value: "GitHub Actions cron",
+        kind: "structural",
+        note: "번호는 추첨 뒤 자동 커밋 · 판매점은 데이터 PR",
       },
     ],
     screens: [
       {
         kind: "image",
-        src: "/projects/junsgram/signin.png",
-        alt: "로그인 화면",
-        caption: "로그인",
+        src: "/projects/meisho/region.png",
+        alt: "도쿄도 지역 페이지",
+        caption: "지역 페이지 — 도쿄도 명당 순위 · 1등 횟수만큼 커지는 소인 핀",
       },
       {
         kind: "image",
-        src: "/projects/junsgram/profile.png",
-        alt: "프로필 화면",
-        caption: "프로필",
+        src: "/projects/meisho/store.png",
+        alt: "판매점 상세 화면",
+        caption: "판매점 상세 — 당첨 이력 · 길찾기/공유/저장 · 긴자 일대 핀",
+      },
+      {
+        kind: "image",
+        src: "/projects/meisho/numbers.png",
+        alt: "로또6 당첨번호 화면",
+        caption: "당첨번호 — 회차 선택 · 등수별 당첨금 · 이 회차 1등 판매점",
+      },
+      {
+        kind: "image",
+        src: "/projects/meisho/guide.png",
+        alt: "당첨금 받는 법 가이드",
+        caption: "여행자 가이드 — 당첨금 받는 법",
+      },
+      {
+        kind: "image",
+        src: "/projects/meisho/mobile-home.png",
+        alt: "iPhone 홈 화면 캡처",
+        caption: "iPhone (390×844 뷰포트) — 지도 + 바텀시트",
       },
     ],
     diagrams: [
       {
-        title: "Junsgram 신뢰 경계 아키텍처",
-        src: "/diagrams/junsgram-boundary.svg",
+        title: "명당재팬 데이터 파이프라인",
+        src: "/diagrams/meisho-pipeline.svg",
+        description:
+          "GitHub Actions 가 추첨 일정에 맞춰 신문 기사와 공식 사이트를 수집한다. 확실한 좌표만 자동으로 핀을 찍고, 나머지는 확인 대기 큐로 보내 사람이 data/manual 에 보정한다. 사이트는 zod 로 검증한 data/curated 만 읽어 정적 HTML 로 빌드된다.",
       },
     ],
     troubleshooting: {
-      title: "로그인할 때마다 유저가 중복 생성되던 버그",
+      title: "자동으로 찍을 수 있어도, 확실하지 않으면 찍지 않는다",
       situation:
-        "Auth.js v5로 마이그레이션하던 중, Sanity에 유저 문서가 계속 늘어나는 것을 발견했습니다.",
+        "판매점 주소를 국토지리원 주소 검색 API로 좌표로 바꿔 지도에 핀을 찍습니다. 핀이 틀리면 여행자가 엉뚱한 곳으로 길을 찾아가니, 이 서비스에서 가장 비싼 오류입니다.",
       cause:
-        "앱이 Sanity 유저 문서의 키로 user.id를 쓰고 있었습니다. 그런데 이 값은 세션마다 새로 생성되는 랜덤 UUID였습니다. 같은 사람이 로그인해도 매번 다른 키가 나오니, 조회에 실패하고 새 문서를 만들었습니다.",
+        "지오코더는 주소를 끝까지 찾지 못해도 더 짧은 주소로 물러나 그럴듯한 좌표를 돌려줍니다. 응답만 봐서는 성공과 실패를 구분할 수 없습니다.",
       solution:
-        "로그인 방식이 같으면 변하지 않는 Google providerAccountId로 키를 교체했습니다.",
+        "설계 단계에서 주소가 번지 수준까지 정확히 일치할 때만 자동으로 핀을 찍고, 나머지는 지도에 \"위치 확인 중\"으로 두기로 결정했습니다. 구현은 Claude Code가 했습니다. 출시 전 최종 코드 리뷰(별도 Claude 리뷰어)에서 이 규칙을 빠져나가는 구멍 두 개가 나왔습니다. 잘린 주소가 \"일치\"로 판정되는 경우와, 단위가 다른 번지(‘1초메 10’과 ‘1반 10고’)가 같은 문자열로 접히는 경우입니다. 둘 다 회귀 테스트로 막았습니다. 실제 데이터에서 틀린 핀이 나간 사고는 아니었습니다.",
       outcome:
-        "중복 생성이 멈췄습니다. 이 버그는 마이그레이션 때문에 생긴 게 아니라 원래 있던 문제였고, 전환 과정에서 인증 흐름을 다시 읽다가 드러났습니다.",
+        "대가는 핀 수였습니다. 첫 수집 때는 148곳 중 80곳에만 핀이 찍혔습니다. 일부는 제가 구글맵으로 직접 확인해 채웠고, 공식 좌표와 국토지리원 좌표가 150m 안에서 일치하면 자동으로 찍는 조건을 더했습니다. 지금은 157곳 모두 핀이 있고 확인 대기는 0건입니다.",
     },
     techStack: [
-      { name: "Next.js 16", category: "framework" },
-      { name: "React 19", category: "framework" },
+      { name: "Next.js 16 (App Router · static export)", category: "framework" },
       { name: "TypeScript (strict)", category: "language" },
-      { name: "Auth.js v5", category: "auth" },
-      { name: "Vercel", category: "infra" },
+      { name: "maplibre-gl", category: "data" },
+      { name: "zod 4", category: "data" },
+      { name: "Tailwind CSS v4", category: "styling" },
+      { name: "cheerio", category: "tooling" },
+      { name: "Vitest + Playwright", category: "testing" },
+      { name: "GitHub Actions", category: "infra" },
+      { name: "Cloudflare Pages", category: "infra" },
+      { name: "Claude Code", category: "tooling" },
     ],
     links: {
-      demo: "https://junsgram.vercel.app",
-      /*
-       * 임시로 숨김 (복구하려면 이 필드만 지우면 된다).
-       *
-       * 루트(/)가 Google 로그인으로 막혀 있고, 로그인을 통과해도 피드가 비어 있다 —
-       * 검색에서 계정을 찾아 팔로우해야 게시물이 보인다. 즉 장벽이 2단이라
-       * 눌러서 앱을 보기까지 4~5단계가 걸린다.
-       *
-       * 나머지 네 프로젝트는 누르면 곧바로 앱이 뜬다. 그 사이에서 하나만 로그인 벽이면
-       * "열어도 못 보는 데모" 가 되는데, 그건 링크가 없는 것보다 나쁘다 —
-       * 카드에는 이미 스크린샷과 화면 녹화가 있어 무엇을 만들었는지는 전달된다.
-       *
-       * 레포에 비로그인 열람 경로(읽기 전용)를 만든 뒤 이 필드를 지워 링크를 복구한다.
-       */
-      demoHiddenReason: "루트가 로그인으로 막혀 있고 로그인 후에도 팔로우해야 피드가 보인다",
-      repo: "https://github.com/byeonsejun/Junsgram",
+      demo: "https://meisho-japan.pages.dev",
     },
   },
 

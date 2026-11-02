@@ -63,6 +63,9 @@ export function ProjectCard({
           <p className="text-ink-2 max-w-2xl text-sm leading-relaxed text-pretty sm:text-base">
             {p.tagline}
           </p>
+          {p.role ? (
+            <p className="text-ink-3 text-xs sm:text-sm">역할 · {p.role}</p>
+          ) : null}
         </header>
 
         {/* 대표 스크린샷 */}
@@ -196,7 +199,12 @@ function TroubleshootingBlock({ item }: { item: Troubleshooting }) {
         <ul className="flex flex-wrap gap-x-4 gap-y-1">
           {item.references.map((r) => (
             <li key={r.href}>
-              <a href={r.href} className={linkClass}>
+              <a
+                href={r.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+              >
                 {r.label}
               </a>
             </li>
@@ -243,16 +251,23 @@ function LinkRow({ links, name }: { links: ProjectLinks; name: string }) {
           Live Demo
         </a>
       ) : null}
-      <a
-        href={links.repo}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={linkClass}
-      >
-        Repository
-      </a>
+      {links.repo ? (
+        <a
+          href={links.repo}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          Repository
+        </a>
+      ) : null}
       {links.writeup ? (
-        <a href={links.writeup} className={linkClass}>
+        <a
+          href={links.writeup}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
           Writeup
         </a>
       ) : null}

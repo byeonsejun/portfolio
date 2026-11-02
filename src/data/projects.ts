@@ -462,52 +462,130 @@ export const projects: readonly Project[] = [
   },
 
   {
-    slug: "shoppy",
-    name: "SHOPPY",
-    tagline: "React 기반 패션 커머스 웹 애플리케이션",
+    slug: "lumen",
+    name: "LUMEN",
+    tagline:
+      "어두운 쇼룸에서 조명 아래의 가구를 3D로 둘러보는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
+    role: "방향 · 기술 선택 · 실기기 검수는 직접, 설계 세부와 구현은 Claude Code",
     order: 5,
     cover: {
-      src: "/projects/shoppy/preview-home.png",
-      alt: "SHOPPY 홈 화면 미리보기",
+      src: "/projects/lumen/spotlight.png",
+      alt: "LUMEN 쇼룸 — 스포트라이트 아래의 3인 소파",
     },
-    // 의도적으로 비움 — 5순위 프로젝트라 배지 없이 간결하게 간다.
-    metrics: [],
+    metrics: [
+      {
+        label: "모바일 LCP (홈)",
+        value: "5.8s",
+        baseline: "16.2s",
+        kind: "measured",
+        tone: "positive",
+        note: "3D 초기화를 load 뒤 유휴 시간으로 · TBT 9,750ms → 910ms · Lighthouse 12 모바일 · 2026.11.02",
+      },
+      {
+        label: "CLS (상품 상세)",
+        value: "0.003",
+        baseline: "0.373",
+        kind: "measured",
+        tone: "positive",
+        note: "3D 영역 로딩 중 같은 크기 자리 확보 · Lighthouse 12 모바일",
+      },
+      {
+        label: "쇼룸 fps",
+        value: "59.6",
+        kind: "measured",
+        note: "M1 · 최고 품질 고정 · 쇼룸 끝까지 스크롤 평균 · 하위 10% 59",
+      },
+      {
+        label: "3D 모델",
+        value: "20개 · 33MB",
+        kind: "measured",
+        note: "Poly Haven 원본을 빌드 전에 압축 · 저화질본은 전부 2MB 이하",
+      },
+      {
+        label: "테스트",
+        value: "56건",
+        kind: "measured",
+        note: "Vitest 38 · Playwright 18 · 폴백 · 모델 로드 실패 · 404 포함",
+      },
+      {
+        label: "렌더러",
+        value: "WebGPU → WebGL2 → 이미지",
+        kind: "structural",
+        note: "WebGPURenderer 하나 · 노드 머티리얼과 TSL만 사용",
+      },
+      {
+        label: "품질 조절",
+        value: "3단계 · 1초마다",
+        kind: "structural",
+        note: "DPR · 그림자 · bloom · AO · 텍스처 1k/2k",
+      },
+    ],
     screens: [
       {
         kind: "image",
-        src: "/projects/shoppy/preview-shop.png",
-        alt: "상품 목록 화면",
-        caption: "상품 목록 — 정렬 · BEST/HOT/NEW 배지",
+        src: "/projects/lumen/room.png",
+        alt: "가구들이 놓인 방 전체",
+        caption: "마지막 장면 — 조명이 켜지며 방이 드러나고, 가구를 누르면 상세로",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/detail.png",
+        alt: "상품 상세 3D 뷰어와 치수",
+        caption: "상품 상세 — 돌려 보기 · 확대 · 실제 치수(mm) 표시",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/spotlight-table.png",
+        alt: "스포트라이트 아래의 커피 테이블",
+        caption: "쇼룸 — 스크롤하면 다음 가구가 조명 아래로 들어온다",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/shop.png",
+        alt: "상품 목록",
+        caption: "상품 목록 — 카테고리 탭 · 3D는 목록에서 쓰지 않는다",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/mobile-spotlight.png",
+        alt: "모바일 쇼룸 화면",
+        caption: "모바일 (390×844 뷰포트) — 같은 스크롤 연출, 품질은 mid에서 시작",
       },
     ],
     diagrams: [
       {
-        title: "SHOPPY 서버 상태 캡슐화 구조",
-        src: "/diagrams/shoppy-state.svg",
+        title: "LUMEN 렌더러 폴백과 품질 자동 조절",
+        src: "/diagrams/lumen-quality.svg",
+        description:
+          "무엇으로 그릴지는 접속할 때 한 번 정한다. WebGPU 어댑터를 못 얻으면 같은 렌더러를 WebGL2 백엔드로 돌리고, 그것도 안 되면 3D 대신 이미지를 둔다. 얼마나 그릴지는 1초마다 다시 정한다. 시작값은 GPU 등급으로 잡고, 실제 프레임을 보면서 한 단계씩 내리고 올린다.",
       },
     ],
     troubleshooting: {
-      title: "비로그인 상태에서 발생하던 불필요한 요청",
+      title: "품질 조절이 좋은 기기에서도 최저 품질로 시작했다",
       situation:
-        "로그인하지 않은 사용자가 페이지에 들어와도 장바구니 조회 요청이 나갔습니다.",
+        "1초마다 평균 fps를 재서 30 아래면 품질을 한 단계 내리는 규칙을 붙였습니다. 그런데 M1 맥북에서 쇼룸을 열자 첫 화면부터 그림자도 bloom도 없는 최저 단계로 떨어져 있었습니다.",
       cause:
-        "useCart 훅이 컴포넌트 마운트 시점에 무조건 실행됐습니다. uid가 없으면 조회할 대상 자체가 없는데도 요청은 그대로 나갔습니다.",
+        "화면 구석에 fps를 띄워 보니 첫 1초가 4fps였습니다. 셰이더 컴파일과 3D 모델 디코딩이 처음 몇 프레임을 잡아먹는 구간이라, 기기가 느린 게 아니라 준비 중이었던 겁니다. 같은 이유로 탭을 숨겼다 돌아오는 순간도 위험했습니다. 그동안 프레임이 멈췄으니 숫자만 보면 저사양으로 보입니다.",
       solution:
-        "React Query의 enabled: !!uid 가드를 걸어 uid가 확정된 뒤에만 쿼리가 실행되게 했습니다.",
+        "판단에 쓰는 측정을 걸렀습니다. 시작 직후 두 구간은 화면에만 보여 주고 판단에서는 빼고, 1.5초보다 길게 늘어진 구간도 버립니다. 단계를 바꾼 뒤에는 이전 측정을 지워 새 상태로만 다시 판단합니다. GPU 등급이 최저로 나와도 한 단계는 올라갈 여지를 남겨, 첫 판정이 틀렸을 때 실제 프레임으로 회복할 수 있게 했습니다. 이 규칙은 순수 함수로 떼어 단위 테스트로 묶었습니다.",
       outcome:
-        "비로그인 사용자의 불필요한 요청이 사라졌습니다. Firebase REST 호출을 fetch 얇은 래퍼로 직접 제어하고 모든 읽기에 빈 값 폴백을 두어, 네트워크 실패가 화면 전체를 깨뜨리지 않도록 했습니다.",
+        "M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps). 모바일 에뮬레이션에서는 중간 단계로 시작해 실제 프레임을 보고 최고 단계로 올라갔습니다. 반대로 GPU 없는 테스트 브라우저에서는 11fps가 나오자 최저 단계까지 내려가, 내려야 할 때는 제대로 내려간다는 것도 확인했습니다.",
     },
     techStack: [
-      { name: "React 18", category: "framework" },
-      { name: "React Router 6", category: "framework" },
-      { name: "TanStack Query 4", category: "state" },
-      { name: "Firebase (Auth + RTDB)", category: "data" },
-      { name: "Cloudinary", category: "infra" },
-      { name: "Tailwind CSS 3", category: "styling" },
+      { name: "Next.js 16 (App Router · Cache Components)", category: "framework" },
+      { name: "TypeScript (strict)", category: "language" },
+      { name: "three.js (WebGPURenderer · TSL)", category: "framework" },
+      { name: "React Three Fiber · drei", category: "framework" },
+      { name: "zustand", category: "state" },
+      { name: "Tailwind CSS v4", category: "styling" },
+      { name: "glTF-Transform · meshoptimizer", category: "tooling" },
+      { name: "Vitest + Playwright", category: "testing" },
+      { name: "Vercel", category: "infra" },
+      { name: "Claude Code", category: "tooling" },
     ],
     links: {
-      demo: "https://sejun-shop.netlify.app",
-      repo: "https://github.com/byeonsejun/shoppy",
+      demo: "https://lumen-showroom.vercel.app",
+      repo: "https://github.com/byeonsejun/lumen",
     },
   },
 ];

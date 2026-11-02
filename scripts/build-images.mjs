@@ -103,9 +103,9 @@ const THUMB_CROPS = {
   // 0%: 핑크 브랜드 헤더 + 날씨 카드가 거의 통째로 들어간다.
   //     2% 만 내려도 헤더가 얇은 띠로 남아 실수처럼 보인다.
   "date/mobile-ipadmini-home.png": 0.0,
-  // 9%: "QUIET ESSENTIALS" 헤드라인 + 서브텍스트 + SHOP NOW 버튼이 온전히 들어간다.
-  //     0% 는 헤드라인을, 6% 는 CTA 버튼을 자른다.
-  "shoppy/preview-home.png": 0.09,
+  // 38%: 의자 등받이부터 다리까지 온전히 들어간다. 위쪽은 빈 어둠이라 잘라도 잃는 게 없고,
+  //      30% 는 의자 다리를 자른다.
+  "lumen/mobile-spotlight.png": 0.38,
   // 0%: 남색 헤더 + 검색창 + 복권 칩 + 지도 윗부분. 바텀시트는 아래라 잘려도 무방하다.
   "meisho/mobile-home.png": 0.0,
 };

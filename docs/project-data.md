@@ -203,6 +203,16 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 - 코드 리뷰는 별도 리뷰어 없이 Claude 가 스스로 했다. 카드에 리뷰 이야기를 넣지 않는다.
 - 실기기 fps 수치는 받지 않았다(사용자 확인: "문제없이 돈다"). 저사양 기기 수치는 카드에 쓰지 않는다.
 
+**2차 (2026-11-03 운영 배포)** — 담기 · 내 방 장바구니 · 카카오/구글/데모 로그인 · 토스페이먼츠 테스트 결제 · 주문 내역.
+- 직접 한 것: 2차가 보여 줄 것을 "결제 기능"이 아니라 "3D 경험이 구매까지 이어진다"로 정함(결제의 깊이는 Nextour 가 이미 보여 준다),
+  장바구니 화면을 방 + 목록 좌우 나누기로 선택, 데모 계정 버튼을 넣기로 결정, 운영에서 결제 · 카카오 · 구글 로그인을 직접 끝까지 확인.
+- Claude 가 정한 것: 가구 자동 배치 규칙, 브라우저마다 따로 만드는 데모 계정(24시간 뒤 정리), 서버 함수 리전 sin1(Neon 싱가포르),
+  결제 시뮬레이션 모드(로컬 · e2e 전용). 2차 설계 문서 `docs/superpowers/specs/2026-11-02-lumen-phase2-design.md` 11장.
+- 운영 확인에서 막힌 것 두 가지(README 7장): 토스 API 키 접근 정책(대한민국 IP 만 허용)이 싱가포르 함수를 403 으로 막음 → 정책 삭제.
+  카카오 리다이렉트 URI 미등록(KOE006) → 등록. 둘 다 코드 문제가 아니라 외부 콘솔 설정이었다.
+- 2차 운영 성능은 lumen `docs/perf/phase2.md`(운영 주소 기준이라 1차 로컬 수치와 나란히 비교하지 않는다). 상품 상세 모바일 LCP 5.1s 는
+  개선 전이라 카드 지표에 넣지 않는다.
+
 근거는 2026-11-02 에 직접 잰 값이다. 측정 방법 전체는 lumen 저장소 `docs/perf/phase1.md`.
 
 ### metrics
@@ -212,7 +222,8 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 | CLS (상품 상세) | 0.003 | 0.373 | `/products/ember-sofa`, 같은 조건. 3D 영역 `dynamic()` 의 loading 에 같은 크기 자리를 줌. Performance 0.22 → 0.71 |
 | 쇼룸 fps | 59.6 | | M1 · Chromium(WebGPU) · `?tier=2&adaptive=off` · 1440×900 · 41단계 스크롤 · 하위 10% 59 · 최저 55 |
 | 3D 모델 | 20개 · 33MB | | `public/models/manifest.json` 합계. 1k 는 전부 2MB 이하(캔들 홀더만 텍스처 512로 줄임) |
-| 테스트 | 56건 | | `vitest run` 38 · `playwright test` 18. 커밋 `d10cc37` |
+| 테스트 | 140건 | | 2차 후. `npm run check` 단위 73 · `npm run test:db` 통합 22 · `npm run test:e2e` 45. 커밋 `54f5bf2`, 2026-11-03 (1차 때는 56건: 38 · 18) |
+| 결제 | 서버 재계산 · 승인 1회 | | `src/orders/confirm.ts` · `src/payments/toss.ts`. 금액 불일치 거부(통합 · e2e), 완료 새로고침 재승인 없음(e2e), Idempotency-Key = orderId |
 | 렌더러 | WebGPU → WebGL2 → 이미지 | | `src/three/capability.ts` · `createRenderer.ts` |
 | 품질 조절 | 3단계 · 1초마다 | | `src/three/quality/policy.ts` · `presets.ts` |
 

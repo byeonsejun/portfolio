@@ -465,7 +465,7 @@ export const projects: readonly Project[] = [
     slug: "lumen",
     name: "LUMEN",
     tagline:
-      "어두운 쇼룸에서 조명 아래의 가구를 3D로 둘러보는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
+      "어두운 쇼룸에서 3D로 둘러본 가구를 그 자리에서 담고, 담은 가구가 놓인 내 방을 보고, 결제하면 그 위로 불이 켜지는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
     role: "방향 · 기술 선택 · 실기기 검수는 직접, 설계 세부와 구현은 Claude Code",
     order: 5,
     cover: {
@@ -503,9 +503,15 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "56건",
+        value: "140건",
         kind: "measured",
-        note: "Vitest 38 · Playwright 18 · 폴백 · 모델 로드 실패 · 404 포함",
+        note: "단위 73 · DB 통합 22 · Playwright 45 · 금액 위조 · 새로고침 재승인 · 남의 주문 404 포함",
+      },
+      {
+        label: "결제",
+        value: "서버 재계산 · 승인 1회",
+        kind: "structural",
+        note: "토스페이먼츠 테스트 결제 · 금액이 다르면 승인 거부 · 주문 번호를 멱등 키로",
       },
       {
         label: "렌더러",
@@ -521,6 +527,18 @@ export const projects: readonly Project[] = [
       },
     ],
     screens: [
+      {
+        kind: "image",
+        src: "/projects/lumen/cart.png",
+        alt: "담은 가구가 자동으로 놓인 장바구니 방과 목록",
+        caption: "장바구니 — 담은 가구가 방에 놓인다. 목록에 마우스를 올리면 그 가구에 조명이",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/complete.png",
+        alt: "결제 완료 후 불이 켜진 방",
+        caption: "결제 완료 — 어두운 방에서 산 가구 위로 불이 하나씩 켜진다",
+      },
       {
         kind: "image",
         src: "/projects/lumen/room.png",
@@ -578,6 +596,9 @@ export const projects: readonly Project[] = [
       { name: "React Three Fiber · drei", category: "framework" },
       { name: "zustand", category: "state" },
       { name: "Tailwind CSS v4", category: "styling" },
+      { name: "Auth.js v5 (카카오 · 구글 · 데모 계정)", category: "auth" },
+      { name: "Prisma · Neon Postgres", category: "data" },
+      { name: "토스페이먼츠 (테스트 결제)", category: "infra" },
       { name: "glTF-Transform · meshoptimizer", category: "tooling" },
       { name: "Vitest + Playwright", category: "testing" },
       { name: "Vercel", category: "infra" },

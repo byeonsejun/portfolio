@@ -465,7 +465,7 @@ export const projects: readonly Project[] = [
     slug: "lumen",
     name: "LUMEN",
     tagline:
-      "어두운 쇼룸에서 3D로 둘러본 가구를 그 자리에서 담고, 담은 가구가 놓인 내 방을 보고, 결제하면 그 위로 불이 켜지는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
+      "어두운 쇼룸에서 3D로 가구를 둘러보고, 천 색을 바꿔 보고, 내 방 크기에 직접 놓아 본 뒤 결제하면 그 위로 불이 켜지는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
     role: "방향 · 기술 선택 · 실기기 검수는 직접, 설계 세부와 구현은 Claude Code",
     order: 5,
     cover: {
@@ -503,9 +503,15 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "158건",
+        value: "212건",
         kind: "measured",
-        note: "단위 82 · DB 통합 24 · Playwright 52 · 금액 위조 · 새로고침 재승인 · 남의 주문 404 · 끊긴 요청 재현 포함",
+        note: "단위 109 · DB 통합 28 · Playwright 75 · 금액 위조 · 새로고침 재승인 · 끊긴 요청 재현 · 색별 장바구니 · 방 배치 포함",
+      },
+      {
+        label: "색 바꾸기",
+        value: "텍스처 한 장에서 천만",
+        kind: "structural",
+        note: "대표색과의 거리로 가림막 → 밝기 비율 유지 재채색 셰이더 · 7개 가구 · 고른 색이 주문까지",
       },
       {
         label: "결제",
@@ -527,6 +533,18 @@ export const projects: readonly Project[] = [
       },
     ],
     screens: [
+      {
+        kind: "image",
+        src: "/projects/lumen/colors.png",
+        alt: "Velvet 2인 소파 네 가지 색 — 조각 원목 프레임은 그대로",
+        caption: "색 바꾸기 — 천과 나무가 한 장에 그려진 텍스처에서 천만 다시 칠한다",
+      },
+      {
+        kind: "image",
+        src: "/projects/lumen/room-planner.png",
+        alt: "내 방에 놓아 보기 — 방 크기 입력과 가구 배치",
+        caption: "내 방에 놓아 보기 — 방 크기를 넣고 담은 가구를 끌어 옮기고 돌린다",
+      },
       {
         kind: "image",
         src: "/projects/lumen/cart.png",

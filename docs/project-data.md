@@ -211,7 +211,10 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 - 운영 확인에서 막힌 것 두 가지(README 7장): 토스 API 키 접근 정책(대한민국 IP 만 허용)이 싱가포르 함수를 403 으로 막음 → 정책 삭제.
   카카오 리다이렉트 URI 미등록(KOE006) → 등록. 둘 다 코드 문제가 아니라 외부 콘솔 설정이었다.
 - 2차 운영 성능은 lumen `docs/perf/phase2.md`(운영 주소 기준이라 1차 로컬 수치와 나란히 비교하지 않는다). 상품 상세 모바일 LCP 5.1s 는
-  개선 전이라 카드 지표에 넣지 않는다.
+  Lighthouse 12 시뮬레이션 추정이었고 실제 그려지는 시점은 0.3~0.5초였다(2026-11-04 재측정). 버전에 따라 0.9~5.4s 로 흔들리는
+  숫자라 카드 지표에 넣지 않는다.
+- 2026-11-04 미뤄 둔 문제 정리: 데모 계정 IP 한도, 끊긴 장바구니 저장 재전송, 같은 가구 여러 개 강조, 완료 장면 의자 배치,
+  쇼룸 이름표 겹침, three.js 청크 요청을 load 뒤로, (새로 찾은) 로그인 확인 중 담기 두 배. 스크린샷 cart · complete 교체.
 
 근거는 2026-11-02 에 직접 잰 값이다. 측정 방법 전체는 lumen 저장소 `docs/perf/phase1.md`.
 
@@ -222,7 +225,7 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 | CLS (상품 상세) | 0.003 | 0.373 | `/products/ember-sofa`, 같은 조건. 3D 영역 `dynamic()` 의 loading 에 같은 크기 자리를 줌. Performance 0.22 → 0.71 |
 | 쇼룸 fps | 59.6 | | M1 · Chromium(WebGPU) · `?tier=2&adaptive=off` · 1440×900 · 41단계 스크롤 · 하위 10% 59 · 최저 55 |
 | 3D 모델 | 20개 · 33MB | | `public/models/manifest.json` 합계. 1k 는 전부 2MB 이하(캔들 홀더만 텍스처 512로 줄임) |
-| 테스트 | 140건 | | 2차 후. `npm run check` 단위 73 · `npm run test:db` 통합 22 · `npm run test:e2e` 45. 커밋 `54f5bf2`, 2026-11-03 (1차 때는 56건: 38 · 18) |
+| 테스트 | 158건 | | 미뤄 둔 문제 정리 후. `npm run check` 단위 82 · `npm run test:db` 통합 24 · `npm run test:e2e` 52. 커밋 `7a63976`, 2026-11-04 (2차 배포 때 140건 · 1차 때 56건) |
 | 결제 | 서버 재계산 · 승인 1회 | | `src/orders/confirm.ts` · `src/payments/toss.ts`. 금액 불일치 거부(통합 · e2e), 완료 새로고침 재승인 없음(e2e), Idempotency-Key = orderId |
 | 렌더러 | WebGPU → WebGL2 → 이미지 | | `src/three/capability.ts` · `createRenderer.ts` |
 | 품질 조절 | 3단계 · 1초마다 | | `src/three/quality/policy.ts` · `presets.ts` |

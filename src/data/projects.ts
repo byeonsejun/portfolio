@@ -503,9 +503,9 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "140건",
+        value: "158건",
         kind: "measured",
-        note: "단위 73 · DB 통합 22 · Playwright 45 · 금액 위조 · 새로고침 재승인 · 남의 주문 404 포함",
+        note: "단위 82 · DB 통합 24 · Playwright 52 · 금액 위조 · 새로고침 재승인 · 남의 주문 404 · 끊긴 요청 재현 포함",
       },
       {
         label: "결제",

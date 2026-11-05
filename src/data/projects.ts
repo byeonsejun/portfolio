@@ -465,7 +465,7 @@ export const projects: readonly Project[] = [
     slug: "lumen",
     name: "LUMEN",
     tagline:
-      '가구 쇼핑을 "둘러보기 → 색 바꾸기 → 내 방에 놓기"로 이은, 3D 쇼룸 중심 쇼핑몰',
+      "가구 쇼핑을 3D 쇼룸 하나로 압축한, 조명 중심 가구 쇼핑몰",
     role: "방향 · 기술 선택 · 실기기 검수는 직접, 설계 세부와 구현은 Claude Code",
     order: 5,
     cover: {

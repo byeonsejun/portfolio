@@ -465,7 +465,7 @@ export const projects: readonly Project[] = [
     slug: "lumen",
     name: "LUMEN",
     tagline:
-      "어두운 쇼룸에서 3D로 가구를 둘러보고, 천 색을 바꿔 보고, 내 방 크기에 직접 놓아 본 뒤 결제하면 그 위로 불이 켜지는 가구 쇼핑몰. 기기 성능에 맞춰 스스로 품질을 낮추고 올린다",
+      '가구 쇼핑을 "둘러보기 → 색 바꾸기 → 내 방에 놓기"로 이은, 3D 쇼룸 중심 쇼핑몰',
     role: "방향 · 기술 선택 · 실기기 검수는 직접, 설계 세부와 구현은 Claude Code",
     order: 5,
     cover: {

@@ -61,6 +61,12 @@ export default function Home() {
 
         <Contact />
       </main>
+
+      <footer className="mx-auto w-full max-w-5xl px-4 pb-10 sm:px-6">
+        <p className="text-ink-3 font-mono text-[11px] tracking-wide">
+          Copyright © 2026 BYUN SEJUN. All Rights Reserved.
+        </p>
+      </footer>
     </>
   );
 }

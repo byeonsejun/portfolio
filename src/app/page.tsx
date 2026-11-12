@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * 단일 페이지. hero → works(5개 전개형 카드) → contact.
+ * 단일 페이지. hero → works(6개 전개형 카드) → contact.
  *
  * (1) 셸 · (2) hero · (3) works 카드 · (4) contact + 콜로폰 — 완료.
  * 라이트박스는 별도 단계.

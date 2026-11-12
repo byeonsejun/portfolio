@@ -1,6 +1,6 @@
 # 변세준 — Frontend Portfolio
 
-프로젝트 5개를 전개형 카드로 펼쳐 놓은 단일 페이지. 정적 사이트이고 서버
+프로젝트 6개를 전개형 카드로 펼쳐 놓은 단일 페이지. 정적 사이트이고 서버
 런타임이 없다.
 
 - **스택** Next.js 16 App Router · React 19 · TypeScript strict · Tailwind v4

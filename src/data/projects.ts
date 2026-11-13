@@ -641,9 +641,9 @@ export const projects: readonly Project[] = [
     metrics: [
       {
         label: "테스트",
-        value: "173건",
+        value: "176건",
         kind: "measured",
-        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 월 예산 보호 재현 포함 · 2026.11.12",
+        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 월 예산 보호 재현 포함 · 2026.11.13",
       },
       {
         label: "CCTV 주소 유효 시간",

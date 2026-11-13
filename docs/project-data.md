@@ -257,3 +257,53 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps). 모바일 에뮬레이션에서는 중간 단계로 시작해
 실제 프레임을 보고 최고 단계로 올라갔습니다. 반대로 GPU 없는 테스트 브라우저에서는 11fps가 나오자 최저 단계까지
 내려가, 내려야 할 때는 제대로 내려간다는 것도 확인했습니다.
+
+---
+
+## 6. 전국 도로 상황실 (traffic-room)
+
+**역할 분담**: 주제 · 시각 방향 · 구조 선택은 직접, 설계 세부와 구현은 Claude Code. 카드에 `role`로 밝힌다.
+2026-11-12 1차 운영 배포. 근거는 traffic-room 저장소 README와 설계 문서 `docs/superpowers/specs/2026-11-12-traffic-room-design.md`.
+
+- 직접 한 것: 주제(전국 고속도로 · 국도 관제), 시안 A · B · C 중 C "야간 속도 지도", CCTV 크게 보기, Next.js,
+  프론트(Vercel)와 실시간 서버(Render) 분리, 0원 운영(결제 수단 연결 금지), 1시간 지연 재생에 동의, cron-job.org 깨우기 설정.
+- Claude가 정한 것: 송출 순서대로 이벤트 번호 매기기, 재접속 따라잡기(`/ws?lastId=`, 연결별 순서 큐), 스케줄러 로드 창,
+  수집을 Mac launchd로 옮기기 등 R1~R22. 설계 문서와 작업 기록에 "틀렸을 때 비용"과 함께 남겼다.
+- 1차 범위는 돌발 마커 · WebSocket 지연 재생 · 피드 · CCTV · 연결 상태다. 도로 속도선 · SSE 지표 · 차트는 2차라서 카드에 쓰지 않는다.
+- 수집이 사용자 Mac에 묶여 있어서, Mac이 잠든 동안은 새 상황이 없다(화면에 마지막 수집 시각 표시). 카드에 "24시간 무중단"처럼 쓰지 않는다.
+
+### metrics
+| label | value | baseline | note |
+|---|---|---|---|
+| 테스트 | 176건 | | `pnpm test`, Test Files 20, 2026-11-13 (커밋 `c7189ff` 기준. 피드 재현 테스트 3개 추가 전 `06a9ffb` 때 173건) |
+| CCTV 주소 유효 시간 | 8시간 이상 | | 발급 후 10~480분 사이 7회 302 정상. 그 뒤는 재지 않았다. 설계 문서 3장 |
+| ITS 호출 | 월 744 + 186건 | | 서비스별 월 1,000건. 돌발 매시 1회(744), CCTV 목록 ex · its 각 하루 3회(186). 950건 정지는 `apps/collector` 예산 보호. `docs/deploy.md` |
+| 지연 재생 | 발생 시각 + 60분 | | 송출 시각은 [수집, 수집+60분]으로 묶고 전역 최댓값 이상으로 보정. `packages/db` event_log id = 송출 순서 |
+| 재접속 | /ws?lastId= · 연결별 순서 큐 | | `apps/realtime/src/server.ts` · `hub.ts`. 테스트 `server.test.ts` "lastId in the url is resumed before any broadcast", "a broadcast during a slow resume arrives after the resumed events". 커밋 `e8189cc`, `126ce4f` |
+| CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. `apps/web/src/components/CctvPanel.tsx` (새 주소 1회 요청, 10초 대기) |
+| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free · OpenFreeMap · cron-job.org |
+
+스크린샷 4장은 2026-11-12 운영 화면(https://traffic-room.vercel.app)을 1440×900 · 2배로 찍었다. `arrival.png`의 "방금 들어온 상황"은
+17:35에 난 실제 고장이 18:35에 송출된 장면이다.
+
+### troubleshooting: 재접속하면 놓친 이벤트가 영영 사라졌다
+
+**Situation**
+연결이 끊겼다 다시 붙으면 클라이언트가 마지막으로 받은 이벤트 번호를 보내고, 서버는 그 뒤의 이벤트를 DB에서 찾아
+돌려줍니다. 그런데 검토 중에, 재접속하는 순간 새 이벤트가 송출되면 그 사이에 놓친 이벤트가 화면에 끝내 나오지 않는
+경로가 나왔습니다.
+
+**Cause**
+서버가 따라잡기 응답을 DB에서 찾는 동안 새 이벤트 브로드캐스트가 먼저 나갔습니다. 클라이언트는 더 큰 번호를 먼저 받고
+마지막 번호를 올려 버리니, 뒤늦게 도착한 따라잡기 응답은 전부 "이미 본 것"으로 버려졌습니다. 중복을 거르려고 넣은
+규칙이 유실을 만든 셈입니다.
+
+**Solution**
+연결마다 처리 줄을 두고 브로드캐스트를 따라잡기 응답 뒤에 세웠습니다. 고치고 나서도 틈이 하나 남아 있었습니다.
+클라이언트가 연결된 뒤 따라잡기를 요청하는 그 왕복 사이에 나간 브로드캐스트는 여전히 앞질렀습니다. 그래서 마지막
+번호를 요청 메시지가 아니라 접속 주소(/ws?lastId=)에 실어, 서버가 연결을 받자마자 첫 작업으로 따라잡게 했습니다.
+
+**Outcome**
+"같은 이벤트가 두 번 오는 건 괜찮지만 빠지는 건 안 된다"를 원칙으로 정했습니다. 중복은 번호로 걸러지지만 빠진 건
+아무도 모르기 때문입니다. 두 경로 모두 테스트로 재현한 뒤 고쳤고, 같은 원칙으로 스케줄러가 30분 사이에 송출 시각이
+지난 이벤트 약 4분의 1을 놓치던 문제도 찾아 고쳤습니다(`scheduler.test.ts` "event inserted after the last reload …").

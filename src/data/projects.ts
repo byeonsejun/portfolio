@@ -627,4 +627,117 @@ export const projects: readonly Project[] = [
       repo: "https://github.com/byeonsejun/lumen",
     },
   },
+  {
+    slug: "traffic-room",
+    name: "전국 도로 상황실",
+    tagline:
+      "ITS 공공 데이터를 지도 · 실시간 피드 · CCTV 생방송 한 화면으로 압축한, 야간 도로 관제실",
+    role: "주제 · 시각 방향 · 구조 선택은 직접, 설계 세부와 구현은 Claude Code",
+    order: 6,
+    cover: {
+      src: "/projects/traffic-room/overview.png",
+      alt: "전국 도로 상황실 — 어두운 지도 위 돌발상황 400여 건과 경부선 CCTV",
+    },
+    metrics: [
+      {
+        label: "테스트",
+        value: "176건",
+        kind: "measured",
+        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 월 예산 보호 재현 포함 · 2026.11.13",
+      },
+      {
+        label: "CCTV 주소 유효 시간",
+        value: "8시간 이상",
+        kind: "measured",
+        note: "발급 후 10분~480분 사이 7회 실측 · 그래서 목록은 하루 3번만 새로 받는다",
+      },
+      {
+        label: "ITS 호출",
+        value: "월 744 + 186건",
+        kind: "measured",
+        note: "서비스별 월 1,000건 한도 안 · 돌발 매시 1회 · CCTV 목록 하루 3회 × 2종 · 950건에서 자동 정지",
+      },
+      {
+        label: "지연 재생",
+        value: "발생 시각 + 60분",
+        kind: "structural",
+        note: "매시 수집한 새 상황을 실제 간격대로 하나씩 WebSocket 송출 · 가짜 이벤트 없음 · 지연은 화면에 표시",
+      },
+      {
+        label: "재접속",
+        value: "/ws?lastId= · 연결별 순서 큐",
+        kind: "structural",
+        note: "중복은 괜찮고 빠지는 건 안 된다 — 접속하자마자 놓친 이벤트를 따라잡고 브로드캐스트는 그 뒤에",
+      },
+      {
+        label: "CCTV 재생",
+        value: "브라우저 직접 HLS",
+        kind: "structural",
+        note: "모든 단계 CORS * 를 실측으로 확인 · 중계 서버 없음 · 만료 시 새 주소 1회 요청 후 안내",
+      },
+      {
+        label: "운영비",
+        value: "0원",
+        kind: "structural",
+        note: "Vercel Hobby · Render 무료 · Neon 무료 · OpenFreeMap · 수집은 국내 회선 Mac launchd",
+      },
+    ],
+    screens: [
+      {
+        kind: "image",
+        src: "/projects/traffic-room/arrival.png",
+        alt: "실시간 피드에 방금 들어온 고장 상황 한 건",
+        caption: "방금 들어온 상황 — 17:35에 난 고장이 18:35에 WebSocket으로 도착했다(운영 화면)",
+      },
+      {
+        kind: "image",
+        src: "/projects/traffic-room/cctv.png",
+        alt: "중부내륙선 고장을 고르자 영산 CCTV가 재생되는 화면",
+        caption: "상황을 누르면 지도가 옮겨 가고 가장 가까운 CCTV가 재생된다. 근처 CCTV로 바꿀 수 있다",
+      },
+      {
+        kind: "image",
+        src: "/projects/traffic-room/fullscreen.png",
+        alt: "국도17 임실 오수IC CCTV 야간 영상 전체화면",
+        caption: "크게 보기 — Fullscreen API, 막힌 환경에서는 화면을 채우는 오버레이로 대신",
+      },
+    ],
+    diagrams: [
+      {
+        title: "전국 도로 상황실 데이터 흐름과 1시간 지연 재생",
+        src: "/diagrams/traffic-flow.svg",
+        description:
+          "ITS는 클라우드 IP를 받지 않아서 수집은 국내 회선의 Mac이 매시 5분에 한다. 새로 생긴 상황은 실제 발생 시각 + 60분을 송출 시각으로 함께 저장하고, 실시간 서버가 30분마다 다가올 이벤트를 읽어 그 시각에 WebSocket으로 내보낸다. 첫 화면은 Vercel API의 스냅샷으로 먼저 채우고, CCTV 영상은 브라우저가 직접 재생한다.",
+      },
+    ],
+    troubleshooting: {
+      title: "재접속하면 놓친 이벤트가 영영 사라졌다",
+      situation:
+        "연결이 끊겼다 다시 붙으면 클라이언트가 마지막으로 받은 이벤트 번호를 보내고, 서버는 그 뒤의 이벤트를 DB에서 찾아 돌려줍니다. 그런데 검토 중에, 재접속하는 순간 새 이벤트가 송출되면 그 사이에 놓친 이벤트가 화면에 끝내 나오지 않는 경로가 나왔습니다.",
+      cause:
+        "서버가 따라잡기 응답을 DB에서 찾는 동안 새 이벤트 브로드캐스트가 먼저 나갔습니다. 클라이언트는 더 큰 번호를 먼저 받고 마지막 번호를 올려 버리니, 뒤늦게 도착한 따라잡기 응답은 전부 \"이미 본 것\"으로 버려졌습니다. 중복을 거르려고 넣은 규칙이 유실을 만든 셈입니다.",
+      solution:
+        "연결마다 처리 줄을 두고 브로드캐스트를 따라잡기 응답 뒤에 세웠습니다. 고치고 나서도 틈이 하나 남아 있었습니다. 클라이언트가 연결된 뒤 따라잡기를 요청하는 그 왕복 사이에 나간 브로드캐스트는 여전히 앞질렀습니다. 그래서 마지막 번호를 요청 메시지가 아니라 접속 주소(/ws?lastId=)에 실어, 서버가 연결을 받자마자 첫 작업으로 따라잡게 했습니다.",
+      outcome:
+        "\"같은 이벤트가 두 번 오는 건 괜찮지만 빠지는 건 안 된다\"를 원칙으로 정했습니다. 중복은 번호로 걸러지지만 빠진 건 아무도 모르기 때문입니다. 두 경로 모두 테스트로 재현한 뒤 고쳤고, 같은 원칙으로 스케줄러가 30분 사이에 송출 시각이 지난 이벤트 약 4분의 1을 놓치던 문제도 찾아 고쳤습니다.",
+    },
+    techStack: [
+      { name: "Next.js 16 (App Router)", category: "framework" },
+      { name: "TypeScript 7", category: "language" },
+      { name: "MapLibre GL 6 · OpenFreeMap", category: "framework" },
+      { name: "hls.js", category: "framework" },
+      { name: "zustand", category: "state" },
+      { name: "Fastify · @fastify/websocket", category: "framework" },
+      { name: "zod (메시지 봉투 검증)", category: "data" },
+      { name: "Neon Postgres", category: "data" },
+      { name: "pnpm 모노레포", category: "tooling" },
+      { name: "Vitest 5 · oxlint", category: "testing" },
+      { name: "Vercel · Render · launchd", category: "infra" },
+      { name: "Claude Code", category: "tooling" },
+    ],
+    links: {
+      demo: "https://traffic-room.vercel.app",
+      repo: "https://github.com/byeonsejun/traffic-room",
+    },
+  },
 ];

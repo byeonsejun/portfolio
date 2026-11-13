@@ -631,37 +631,37 @@ export const projects: readonly Project[] = [
     slug: "traffic-room",
     name: "전국 도로 상황실",
     tagline:
-      "ITS 공공 데이터를 지도 · 실시간 피드 · CCTV 생방송 한 화면으로 압축한, 야간 도로 관제실",
+      "ITS 공공 데이터로 전국 고속도로를 실제 속도 색으로 빛나게 그리고, 돌발상황과 CCTV 생방송까지 한 화면에 모은 야간 도로 관제실",
     role: "주제 · 시각 방향 · 구조 선택은 직접, 설계 세부와 구현은 Claude Code",
     order: 6,
     cover: {
       src: "/projects/traffic-room/overview.png",
-      alt: "전국 도로 상황실 — 어두운 지도 위 돌발상황 400여 건과 경부선 CCTV",
+      alt: "전국 도로 상황실 — 속도 색으로 빛나는 전국 고속도로 위 돌발상황과 경부선 서초 CCTV",
     },
     metrics: [
       {
         label: "테스트",
-        value: "176건",
+        value: "477건",
         kind: "measured",
-        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 월 예산 보호 재현 포함 · 2026.11.13",
+        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 검증 후 덮어쓰기 · 수집 스크립트 재현 포함 · 2026.11.14",
       },
       {
-        label: "CCTV 주소 유효 시간",
-        value: "8시간 이상",
+        label: "고속도로 속도선",
+        value: "본선 8,844구간",
         kind: "measured",
-        note: "발급 후 10분~480분 사이 7회 실측 · 그래서 목록은 하루 3번만 새로 받는다",
+        note: "교통소통 전국 383,618구간 · 75MB 응답에서 본선만 남김 · 위치는 표준노드링크 SHP 를 직접 읽어 연결 · 15분마다 새 색",
       },
       {
-        label: "ITS 호출",
-        value: "월 744 + 186건",
+        label: "지도 타일 재생성",
+        value: "5초에 1,500번 → 0",
         kind: "measured",
-        note: "서비스별 월 1,000건 한도 안 · 돌발 매시 1회 · CCTV 목록 하루 3회 × 2종 · 950건에서 자동 정지",
+        note: "가만히 둔 운영 화면의 워커 메시지 실측 · 흐르는 점선을 dasharray 대신 패턴 이미지 + updateImage 로 바꿔서",
       },
       {
         label: "지연 재생",
-        value: "발생 시각 + 60분",
+        value: "발생 시각 + 20분",
         kind: "structural",
-        note: "매시 수집한 새 상황을 실제 간격대로 하나씩 WebSocket 송출 · 가짜 이벤트 없음 · 지연은 화면에 표시",
+        note: "새 상황을 실제 간격대로 하나씩 WebSocket 송출 · 가짜 이벤트 없음 · 처음 월 1,000건 한도일 땐 + 60분, 한도 상향 뒤 15분 수집으로 줄임",
       },
       {
         label: "재접속",
@@ -673,27 +673,27 @@ export const projects: readonly Project[] = [
         label: "CCTV 재생",
         value: "브라우저 직접 HLS",
         kind: "structural",
-        note: "모든 단계 CORS * 를 실측으로 확인 · 중계 서버 없음 · 만료 시 새 주소 1회 요청 후 안내",
+        note: "모든 단계 CORS * 를 실측으로 확인 · 중계 서버 없음 · 끊기면 복구 → 새 주소 1회 → 회색 \"연결 안 됨\"",
       },
       {
         label: "운영비",
         value: "0원",
         kind: "structural",
-        note: "Vercel Hobby · Render 무료 · Neon 무료 · OpenFreeMap · 수집은 국내 회선 Mac launchd",
+        note: "Vercel Hobby · Render 무료 · Neon 무료(덮어쓰기로 2MB 안팎) · OpenFreeMap · 수집은 국내 회선 Mac launchd",
       },
     ],
     screens: [
       {
         kind: "image",
         src: "/projects/traffic-room/arrival.png",
-        alt: "실시간 피드에 방금 들어온 고장 상황 한 건",
-        caption: "방금 들어온 상황 — 17:35에 난 고장이 18:35에 WebSocket으로 도착했다(운영 화면)",
+        alt: "실시간 피드 맨 위에 방금 들어온 사고 한 건과 해제된 상황들",
+        caption: "방금 들어온 상황 — 07:49에 난 사고가 20분 뒤 WebSocket으로 도착했다. 끝난 상황은 \"해제\"로 내려간다(운영 화면)",
       },
       {
         kind: "image",
         src: "/projects/traffic-room/cctv.png",
-        alt: "중부내륙선 고장을 고르자 영산 CCTV가 재생되는 화면",
-        caption: "상황을 누르면 지도가 옮겨 가고 가장 가까운 CCTV가 재생된다. 근처 CCTV로 바꿀 수 있다",
+        alt: "대구포항선 고장을 고르자 청통와촌 CCTV가 재생되고 지도 핀에 CCTV 이름 툴팁이 뜬 화면",
+        caption: "상황을 누르면 가장 가까운 CCTV가 재생되고, 지도의 \"실시간\" 핀이 그 자리를 가리킨다. 핀에 마우스를 올리면 CCTV 이름",
       },
       {
         kind: "image",
@@ -704,10 +704,10 @@ export const projects: readonly Project[] = [
     ],
     diagrams: [
       {
-        title: "전국 도로 상황실 데이터 흐름과 1시간 지연 재생",
+        title: "전국 도로 상황실 데이터 흐름과 지연 재생",
         src: "/diagrams/traffic-flow.svg",
         description:
-          "ITS는 클라우드 IP를 받지 않아서 수집은 국내 회선의 Mac이 매시 5분에 한다. 새로 생긴 상황은 실제 발생 시각 + 60분을 송출 시각으로 함께 저장하고, 실시간 서버가 30분마다 다가올 이벤트를 읽어 그 시각에 WebSocket으로 내보낸다. 첫 화면은 Vercel API의 스냅샷으로 먼저 채우고, CCTV 영상은 브라우저가 직접 재생한다.",
+          "ITS는 클라우드 IP를 받지 않아서 수집은 국내 회선의 Mac이 15분마다 한다. 새로 생긴 상황은 실제 발생 시각 + 20분을 송출 시각으로 함께 저장하고, 실시간 서버가 다가올 이벤트를 읽어 그 시각에 WebSocket으로 내보낸다. 고속도로 속도와 화면 공통 지표는 같은 수집에서 나와 SSE로 흐른다. 첫 화면은 Vercel API의 스냅샷으로 먼저 채우고, CCTV 영상은 브라우저가 직접 재생한다.",
       },
     ],
     troubleshooting: {
@@ -726,8 +726,9 @@ export const projects: readonly Project[] = [
       { name: "TypeScript 7", category: "language" },
       { name: "MapLibre GL 6 · OpenFreeMap", category: "framework" },
       { name: "hls.js", category: "framework" },
+      { name: "ECharts 6", category: "framework" },
       { name: "zustand", category: "state" },
-      { name: "Fastify · @fastify/websocket", category: "framework" },
+      { name: "Fastify · WebSocket · SSE", category: "framework" },
       { name: "zod (메시지 봉투 검증)", category: "data" },
       { name: "Neon Postgres", category: "data" },
       { name: "pnpm 모노레포", category: "tooling" },

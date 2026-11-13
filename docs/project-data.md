@@ -263,28 +263,33 @@ M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps)
 ## 6. 전국 도로 상황실 (traffic-room)
 
 **역할 분담**: 주제 · 시각 방향 · 구조 선택은 직접, 설계 세부와 구현은 Claude Code. 카드에 `role`로 밝힌다.
-2026-11-12 1차 운영 배포. 근거는 traffic-room 저장소 README와 설계 문서 `docs/superpowers/specs/2026-11-12-traffic-room-design.md`.
+2026-11-12 1차 운영 배포, 2026-11-13 2차(고속도로 속도선 · SSE 지표 · `/insights`) 운영 반영, 2026-11-14 운영 개선(지도 성능 · 툴팁 · 수집 로그)까지.
+근거는 traffic-room 저장소 README와 설계 문서 `docs/superpowers/specs/2026-11-12-traffic-room-design.md`, `2026-11-13-traffic-room-phase2-design.md`.
 
 - 직접 한 것: 주제(전국 고속도로 · 국도 관제), 시안 A · B · C 중 C "야간 속도 지도", CCTV 크게 보기, Next.js,
-  프론트(Vercel)와 실시간 서버(Render) 분리, 0원 운영(결제 수단 연결 금지), 1시간 지연 재생에 동의, cron-job.org 깨우기 설정.
+  프론트(Vercel)와 실시간 서버(Render) 분리, 0원 운영(결제 수단 연결 금지), 지연 재생에 동의, cron-job.org 깨우기 설정,
+  2차 범위(고속도로만 · 덮어쓰기 저장 · 검증된 데이터만 · 한국 범위 · 관제 화면은 핵심 차트만), ITS 한도 상향 신청,
+  운영 중 불편 제기(핀 툴팁, 확대 · 축소 때 속도선 지연).
 - Claude가 정한 것: 송출 순서대로 이벤트 번호 매기기, 재접속 따라잡기(`/ws?lastId=`, 연결별 순서 큐), 스케줄러 로드 창,
-  수집을 Mac launchd로 옮기기 등 R1~R22. 설계 문서와 작업 기록에 "틀렸을 때 비용"과 함께 남겼다.
-- 1차 범위는 돌발 마커 · WebSocket 지연 재생 · 피드 · CCTV · 연결 상태다. 도로 속도선 · SSE 지표 · 차트는 2차라서 카드에 쓰지 않는다.
+  수집을 Mac launchd로 옮기기 등 R1~R22, 2차 Ruling, 성능 원인 측정(워커 메시지 계수)과 패턴 이미지 전환.
+  설계 문서와 작업 기록에 "틀렸을 때 비용"과 함께 남겼다.
+- `/insights` 분석 페이지는 교통소통 API가 과거 값을 주지 않아 배포 뒤 하루에 걸쳐 차오른다. 카드 스크린샷에는 아직 넣지 않았다(2026-11-14 아침 11/24시간).
 - 수집이 사용자 Mac에 묶여 있어서, Mac이 잠든 동안은 새 상황이 없다(화면에 마지막 수집 시각 표시). 카드에 "24시간 무중단"처럼 쓰지 않는다.
 
 ### metrics
 | label | value | baseline | note |
 |---|---|---|---|
-| 테스트 | 176건 | | `pnpm test`, Test Files 20, 2026-11-13 (커밋 `c7189ff` 기준. 피드 재현 테스트 3개 추가 전 `06a9ffb` 때 173건) |
-| CCTV 주소 유효 시간 | 8시간 이상 | | 발급 후 10~480분 사이 7회 302 정상. 그 뒤는 재지 않았다. 설계 문서 3장 |
-| ITS 호출 | 월 744 + 186건 | | 서비스별 월 1,000건. 돌발 매시 1회(744), CCTV 목록 ex · its 각 하루 3회(186). 950건 정지는 `apps/collector` 예산 보호. `docs/deploy.md` |
-| 지연 재생 | 발생 시각 + 60분 | | 송출 시각은 [수집, 수집+60분]으로 묶고 전역 최댓값 이상으로 보정. `packages/db` event_log id = 송출 순서 |
+| 테스트 | 477건 | | `pnpm test`, Test Files 45, 2026-11-14 (커밋 `146ca0a` 기준. 1차 카드 때 176건) |
+| 고속도로 속도선 | 본선 8,844구간 | | 교통소통 전국 응답 383,618구간 · 75MB 실측. 표준노드링크 본선(CONNECT=0) 21,233구간 중 교통 데이터가 오는 구간. 수집 로그 `traffic ok links=8844` |
+| 지도 타일 재생성 | 5초에 1,500번 → 0 | | 2026-11-14 운영 화면에서 `Worker.prototype.postMessage` 계수, 지도를 가만히 둔 5초: 고치기 전 레이어 갱신 125 · 타일 다시 만들기 1,500 → 배포 뒤 0. `line-dasharray` 는 cross-faded-data-driven 이라 setPaintProperty 마다 소스 reload(MapLibre 6.18 `style_layer.ts`). 커밋 `7c8d5ba` |
+| 지연 재생 | 발생 시각 + 20분 | 처음 + 60분 | 서비스별 월 1,000건일 때 매시 수집 · + 60분. 한도 3,000건 승인(2026-11-13) 뒤 15분 수집(월 2,976건) · DELAY_MINUTES=20, 2,990건에서 정지. 커밋 `c804952` |
 | 재접속 | /ws?lastId= · 연결별 순서 큐 | | `apps/realtime/src/server.ts` · `hub.ts`. 테스트 `server.test.ts` "lastId in the url is resumed before any broadcast", "a broadcast during a slow resume arrives after the resumed events". 커밋 `e8189cc`, `126ce4f` |
-| CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. `apps/web/src/components/CctvPanel.tsx` (새 주소 1회 요청, 10초 대기) |
-| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free · OpenFreeMap · cron-job.org |
+| CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. 미디어 오류는 hls.js 복구 → 새 주소 1회(10초) → 회색 "연결 안 됨"(`CctvPanel.tsx`, 커밋 `a1becf7`, `146ca0a`) |
+| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free(덮어쓰기로 2MB 안팎) · OpenFreeMap · cron-job.org |
 
-스크린샷 4장은 2026-11-12 운영 화면(https://traffic-room.vercel.app)을 1440×900 · 2배로 찍었다. `arrival.png`의 "방금 들어온 상황"은
-17:35에 난 실제 고장이 18:35에 송출된 장면이다.
+스크린샷: `overview.png` · `cctv.png` · `arrival.png` 는 2026-11-14 08:07~08:10 운영 화면(https://traffic-room.vercel.app)을
+1440×900 · 2배로 찍어 1920×1200 으로 줄였다(설치된 Chrome + Playwright, CCTV H.264 재생 때문). `arrival.png` 의 "방금 들어온 상황"은
+07:49에 난 실제 사고가 20분 뒤 송출된 장면이다. `fullscreen.png` 는 2026-11-12 그대로(영상만 보여 바뀐 정보가 없다).
 
 ### troubleshooting: 재접속하면 놓친 이벤트가 영영 사라졌다
 

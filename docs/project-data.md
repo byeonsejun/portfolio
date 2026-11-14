@@ -263,47 +263,51 @@ M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps)
 ## 6. 전국 도로 상황실 (traffic-room)
 
 **역할 분담**: 주제 · 시각 방향 · 구조 선택은 직접, 설계 세부와 구현은 Claude Code. 카드에 `role`로 밝힌다.
-2026-11-12 1차 운영 배포. 근거는 traffic-room 저장소 README와 설계 문서 `docs/superpowers/specs/2026-11-12-traffic-room-design.md`.
+2026-11-12 1차 운영 배포, 2026-11-13 2차(고속도로 속도선 · SSE 지표 · `/insights`) 운영 반영, 2026-11-14 운영 개선(지도 성능 · 툴팁 · 수집 로그)까지.
+근거는 traffic-room 저장소 README와 설계 문서 `docs/superpowers/specs/2026-11-12-traffic-room-design.md`, `2026-11-13-traffic-room-phase2-design.md`.
 
 - 직접 한 것: 주제(전국 고속도로 · 국도 관제), 시안 A · B · C 중 C "야간 속도 지도", CCTV 크게 보기, Next.js,
-  프론트(Vercel)와 실시간 서버(Render) 분리, 0원 운영(결제 수단 연결 금지), 1시간 지연 재생에 동의, cron-job.org 깨우기 설정.
+  프론트(Vercel)와 실시간 서버(Render) 분리, 0원 운영(결제 수단 연결 금지), 지연 재생에 동의, cron-job.org 깨우기 설정,
+  2차 범위(고속도로만 · 덮어쓰기 저장 · 검증된 데이터만 · 한국 범위 · 관제 화면은 핵심 차트만), ITS 한도 상향 신청,
+  운영 중 불편 제기(핀 툴팁, 확대 · 축소 때 속도선 지연).
 - Claude가 정한 것: 송출 순서대로 이벤트 번호 매기기, 재접속 따라잡기(`/ws?lastId=`, 연결별 순서 큐), 스케줄러 로드 창,
-  수집을 Mac launchd로 옮기기 등 R1~R22. 설계 문서와 작업 기록에 "틀렸을 때 비용"과 함께 남겼다.
-- 1차 범위는 돌발 마커 · WebSocket 지연 재생 · 피드 · CCTV · 연결 상태다. 도로 속도선 · SSE 지표 · 차트는 2차라서 카드에 쓰지 않는다.
+  수집을 Mac launchd로 옮기기 등 R1~R22, 2차 Ruling, 성능 원인 측정(워커 메시지 계수)과 패턴 이미지 전환.
+  설계 문서와 작업 기록에 "틀렸을 때 비용"과 함께 남겼다.
+- `/insights` 분석 페이지는 교통소통 API가 과거 값을 주지 않아 배포 뒤 하루에 걸쳐 차오른다. 카드 스크린샷에는 아직 넣지 않았다(2026-11-14 아침 11/24시간).
 - 수집이 사용자 Mac에 묶여 있어서, Mac이 잠든 동안은 새 상황이 없다(화면에 마지막 수집 시각 표시). 카드에 "24시간 무중단"처럼 쓰지 않는다.
 
 ### metrics
 | label | value | baseline | note |
 |---|---|---|---|
-| 테스트 | 176건 | | `pnpm test`, Test Files 20, 2026-11-13 (커밋 `c7189ff` 기준. 피드 재현 테스트 3개 추가 전 `06a9ffb` 때 173건) |
-| CCTV 주소 유효 시간 | 8시간 이상 | | 발급 후 10~480분 사이 7회 302 정상. 그 뒤는 재지 않았다. 설계 문서 3장 |
-| ITS 호출 | 월 744 + 186건 | | 서비스별 월 1,000건. 돌발 매시 1회(744), CCTV 목록 ex · its 각 하루 3회(186). 950건 정지는 `apps/collector` 예산 보호. `docs/deploy.md` |
-| 지연 재생 | 발생 시각 + 60분 | | 송출 시각은 [수집, 수집+60분]으로 묶고 전역 최댓값 이상으로 보정. `packages/db` event_log id = 송출 순서 |
+| 테스트 | 477건 | | `pnpm test`, Test Files 45, 2026-11-14 (커밋 `146ca0a` 기준. 1차 카드 때 176건) |
+| 고속도로 속도선 | 본선 8,844구간 | | 교통소통 전국 응답 383,618구간 · 75MB 실측. 표준노드링크 본선(CONNECT=0) 21,233구간 중 교통 데이터가 오는 구간. 수집 로그 `traffic ok links=8844` |
+| 지도 타일 재생성 | 5초에 1,500번 → 0 | | 2026-11-14 운영 화면에서 `Worker.prototype.postMessage` 계수, 지도를 가만히 둔 5초: 고치기 전 레이어 갱신 125 · 타일 다시 만들기 1,500 → 배포 뒤 0. `line-dasharray` 는 cross-faded-data-driven 이라 setPaintProperty 마다 소스 reload(MapLibre 6.18 `style_layer.ts`). 커밋 `7c8d5ba` |
+| 지연 재생 | 발생 시각 + 20분 | 처음 + 60분 | 서비스별 월 1,000건일 때 매시 수집 · + 60분. 한도 3,000건 승인(2026-11-13) 뒤 15분 수집(월 2,976건) · DELAY_MINUTES=20, 2,990건에서 정지. 커밋 `c804952` |
 | 재접속 | /ws?lastId= · 연결별 순서 큐 | | `apps/realtime/src/server.ts` · `hub.ts`. 테스트 `server.test.ts` "lastId in the url is resumed before any broadcast", "a broadcast during a slow resume arrives after the resumed events". 커밋 `e8189cc`, `126ce4f` |
-| CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. `apps/web/src/components/CctvPanel.tsx` (새 주소 1회 요청, 10초 대기) |
-| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free · OpenFreeMap · cron-job.org |
+| CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. 미디어 오류는 hls.js 복구 → 새 주소 1회(10초) → 회색 "연결 안 됨"(`CctvPanel.tsx`, 커밋 `a1becf7`, `146ca0a`) |
+| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free(덮어쓰기로 2MB 안팎) · OpenFreeMap · cron-job.org |
 
-스크린샷 4장은 2026-11-12 운영 화면(https://traffic-room.vercel.app)을 1440×900 · 2배로 찍었다. `arrival.png`의 "방금 들어온 상황"은
-17:35에 난 실제 고장이 18:35에 송출된 장면이다.
+스크린샷: `overview.png` · `cctv.png` · `arrival.png` 는 2026-11-14 08:07~08:10 운영 화면(https://traffic-room.vercel.app)을
+1440×900 · 2배로 찍어 1920×1200 으로 줄였다(설치된 Chrome + Playwright, CCTV H.264 재생 때문). `arrival.png` 의 "방금 들어온 상황"은
+07:49에 난 실제 사고가 20분 뒤 송출된 장면이다. `fullscreen.png` 는 2026-11-12 그대로(영상만 보여 바뀐 정보가 없다).
 
-### troubleshooting: 재접속하면 놓친 이벤트가 영영 사라졌다
+### troubleshooting: 확대할 때마다 속도선이 늦게 뜨던 지도, 원인은 흐르는 점선이었다
+
+근거: 2026-11-14 운영 화면에서 `Worker.prototype.postMessage` 계수(가만히 둔 5초: 레이어 갱신 125 · 타일 다시 만들기 1,500 → 0),
+MapLibre 6.18 `src/style/style_layer.ts` `setPaintProperty`(cross-faded-data-driven 이면 relayout) · `style.ts` `_updateLayer`(소스 reload),
+`render/image_atlas.ts` `patchUpdatedImage`(안쪽만 갱신). 커밋 `7c8d5ba` · `c4adfd5` · `d59e760`. 회귀 테스트 `flow.test.ts`
+"the loop only swaps pattern images — never a paint property …", `MapView.test.tsx` "flow lines draw a pattern image per level, not a dasharray …".
+이전 카드의 트러블슈팅(재접속 유실)은 README 2번에 그대로 있다. 프론트엔드 지원용으로 측정 · 라이브러리 내부 추적이 보이는 이 사례로 바꿨다(2026-11-14 사용자 요청).
 
 **Situation**
-연결이 끊겼다 다시 붙으면 클라이언트가 마지막으로 받은 이벤트 번호를 보내고, 서버는 그 뒤의 이벤트를 DB에서 찾아
-돌려줍니다. 그런데 검토 중에, 재접속하는 순간 새 이벤트가 송출되면 그 사이에 놓친 이벤트가 화면에 끝내 나오지 않는
-경로가 나왔습니다.
+전국 고속도로 8,844구간을 실제 속도 색으로 칠하고, 그 위로 빛이 흐르게 만든 지도입니다. 화면을 오래 켜 두고 쓰다 보니 휠로 확대·축소할 때마다 속도선이 사라졌다가 한참 뒤에야 나타났고, 어느 순간부터는 지도 한쪽이 사각형으로 비어 돌아오지 않았습니다. 테스트는 모두 통과하고 있었고 콘솔에도 오류가 없었습니다.
 
 **Cause**
-서버가 따라잡기 응답을 DB에서 찾는 동안 새 이벤트 브로드캐스트가 먼저 나갔습니다. 클라이언트는 더 큰 번호를 먼저 받고
-마지막 번호를 올려 버리니, 뒤늦게 도착한 따라잡기 응답은 전부 "이미 본 것"으로 버려졌습니다. 중복을 거르려고 넣은
-규칙이 유실을 만든 셈입니다.
+느낌으로 고치지 않고 먼저 쟀습니다. 운영 화면에서 지도가 백그라운드 워커로 보내는 메시지를 세어 보니, 아무것도 안 하고 가만히 둔 5초 동안 타일을 다시 만들라는 요청이 1,500번 나가고 있었습니다. MapLibre 소스를 따라가 보니, 흐르는 점선을 만들려고 바꾸던 line-dasharray 가 내부에서 "cross-faded-data-driven" 속성으로 분류되어 있어서 setPaintProperty 한 번마다 그 소스의 타일을 통째로 다시 만들고 있었습니다. 저는 이 값을 1초에 30번쯤, 그것도 속도선 두 벌에 바꾸고 있었으니 확대·축소로 필요해진 새 타일은 그 줄 뒤에서 기다릴 수밖에 없었습니다. 빈 사각형은 별개였습니다. 지도 타일 요청이 가끔 실패하는데, MapLibre 는 실패한 타일을 다시 받지 않았습니다.
 
 **Solution**
-연결마다 처리 줄을 두고 브로드캐스트를 따라잡기 응답 뒤에 세웠습니다. 고치고 나서도 틈이 하나 남아 있었습니다.
-클라이언트가 연결된 뒤 따라잡기를 요청하는 그 왕복 사이에 나간 브로드캐스트는 여전히 앞질렀습니다. 그래서 마지막
-번호를 요청 메시지가 아니라 접속 주소(/ws?lastId=)에 실어, 서버가 연결을 받자마자 첫 작업으로 따라잡게 했습니다.
+애니메이션이 스타일 속성을 건드리지 않게 바꿨습니다. 점선을 작은 패턴 이미지(line-pattern)로 한 번 깔아 두고, 프레임마다 그 이미지의 픽셀만 밀어 넣습니다(updateImage). 이미지 갱신은 GPU 텍스처의 그 칸만 고칠 뿐 워커에 일을 보내지 않습니다. 이미지 높이가 선 두께에 맞춰 늘어나는 성질을 이용해 획과 틈의 비율을 예전 점선과 똑같이 맞췄고, 이미지 가장자리 1px 은 비워 두었습니다. 지도가 타일을 만들 때 이미지 둘레에 복사해 두는 가장자리 픽셀은 갱신되지 않아서, 비워 두지 않으면 이음매에 멈춘 조각이 비치기 때문입니다. 실패한 타일은 1초·4초·15초 뒤 그 칸만 다시 요청하게 했습니다.
 
 **Outcome**
-"같은 이벤트가 두 번 오는 건 괜찮지만 빠지는 건 안 된다"를 원칙으로 정했습니다. 중복은 번호로 걸러지지만 빠진 건
-아무도 모르기 때문입니다. 두 경로 모두 테스트로 재현한 뒤 고쳤고, 같은 원칙으로 스케줄러가 30분 사이에 송출 시각이
-지난 이벤트 약 4분의 1을 놓치던 문제도 찾아 고쳤습니다(`scheduler.test.ts` "event inserted after the last reload …").
+같은 방법으로 다시 재니 가만히 둔 5초 동안 워커 메시지가 1,500번에서 0번이 됐고, 확대·축소 직후에도 속도선이 바로 보입니다. 이 문제는 화면을 직접 오래 써 보지 않았다면 몰랐을 겁니다. 그 뒤로는 "느리다"는 느낌이 들면 고치기 전에 먼저 숫자로 재고, 고친 뒤에도 같은 숫자로 확인합니다. 회귀 테스트로 흐름 루프가 스타일 속성을 다시는 바꾸지 않는지도 막아 두었습니다.
+

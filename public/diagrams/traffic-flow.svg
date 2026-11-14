@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 326" role="img"><title>전국 도로 상황실 데이터 흐름과 1시간 지연 재생</title><desc>사용자의 Mac이 국내 회선으로 매시 ITS API를 불러 새 돌발상황과 송출 시각(발생 시각 + 60분)을 Neon에 저장한다. Render 실시간 서버는 30분마다 다가올 이벤트를 읽어 송출 시각에 WebSocket으로 브라우저에 보낸다. 첫 화면은 Vercel API의 스냅샷으로 채우고, CCTV 영상은 브라우저가 HLS로 직접 재생한다</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 326" role="img"><title>전국 도로 상황실 데이터 흐름과 지연 재생</title><desc>사용자의 Mac이 국내 회선으로 15분마다 ITS API를 불러 새 돌발상황과 송출 시각(발생 시각 + 20분)을 Neon에 저장한다. Render 실시간 서버는 30분마다 다가올 이벤트를 읽어 송출 시각에 WebSocket으로 브라우저에 보낸다. 첫 화면은 Vercel API의 스냅샷으로 채우고, CCTV 영상은 브라우저가 HLS로 직접 재생한다</desc>
 <style>
 .bx{stroke-width:.5}
 .pf{fill:#EEEDFE;stroke:#534AB7}.pt{fill:#3C3489}.ps{fill:#534AB7}
@@ -35,11 +35,11 @@ text{font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-seri
 }
 </style>
 <defs><marker id="ah-traffic-flow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text x="20" y="24" class="t12 lbl">수집은 국내 회선에서 한 시간에 한 번, 송출은 실제 간격대로</text>
-<g><rect x="20" y="40" width="150" height="56" rx="8" class="bx pf"/><text x="95" y="64" text-anchor="middle" class="t14 pt">내 Mac · launchd</text><text x="95" y="82" text-anchor="middle" class="t12 ps">매시 5분 수집</text></g>
+<text x="20" y="24" class="t12 lbl">수집은 국내 회선에서 15분에 한 번, 송출은 실제 간격대로</text>
+<g><rect x="20" y="40" width="150" height="56" rx="8" class="bx pf"/><text x="95" y="64" text-anchor="middle" class="t14 pt">내 Mac · launchd</text><text x="95" y="82" text-anchor="middle" class="t12 ps">15분마다 수집</text></g>
 <g><rect x="265" y="40" width="150" height="56" rx="8" class="bx pf"/><text x="340" y="64" text-anchor="middle" class="t14 pt">Neon Postgres</text><text x="340" y="82" text-anchor="middle" class="t12 ps">송출 시각을 함께 저장</text></g>
 <g><rect x="510" y="40" width="150" height="56" rx="8" class="bx pf"/><text x="585" y="64" text-anchor="middle" class="t14 pt">Render 실시간 서버</text><text x="585" y="82" text-anchor="middle" class="t12 ps">지연 재생 스케줄러</text></g>
-<g><rect x="20" y="180" width="150" height="56" rx="8" class="bx tf"/><text x="95" y="204" text-anchor="middle" class="t14 tt">ITS 공개 API</text><text x="95" y="222" text-anchor="middle" class="t12 tsb">서비스별 월 1,000건</text></g>
+<g><rect x="20" y="180" width="150" height="56" rx="8" class="bx tf"/><text x="95" y="204" text-anchor="middle" class="t14 tt">ITS 공개 API</text><text x="95" y="222" text-anchor="middle" class="t12 tsb">서비스별 월 3,000건</text></g>
 <g><rect x="265" y="180" width="150" height="56" rx="8" class="bx tf"/><text x="340" y="204" text-anchor="middle" class="t14 tt">CCTV 영상 서버</text><text x="340" y="222" text-anchor="middle" class="t12 tsb">HTTPS HLS · CORS *</text></g>
 <g><rect x="510" y="180" width="150" height="56" rx="8" class="bx af"/><text x="585" y="204" text-anchor="middle" class="t14 at">브라우저</text><text x="585" y="222" text-anchor="middle" class="t12 asb">지도 · 피드 · hls.js</text></g>
 <line x1="170" y1="68" x2="261" y2="68" class="ln" marker-end="url(#ah-traffic-flow)"/><text x="215" y="60" text-anchor="middle" class="t11 lbl">새 상황만</text>
@@ -49,6 +49,6 @@ text{font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-seri
 <line x1="415" y1="208" x2="506" y2="208" class="ln" marker-end="url(#ah-traffic-flow)"/><text x="460" y="200" text-anchor="middle" class="t11 lbl">직접 재생</text>
 <line x1="372" y1="100" x2="500" y2="176" class="dsh" marker-end="url(#ah-traffic-flow)"/><text x="400" y="150" text-anchor="end" class="t11 lbl">첫 화면 스냅샷</text><text x="400" y="164" text-anchor="end" class="t11 lbl">(Vercel API)</text>
 <line x1="20" y1="262" x2="660" y2="262" class="dsh"/>
-<text x="20" y="286" class="t12 lbl">송출 시각 = 실제 발생 시각 + 60분. 한꺼번에 몰리지 않고 일어난 간격 그대로 도착한다</text>
+<text x="20" y="286" class="t12 lbl">송출 시각 = 실제 발생 시각 + 20분. 한꺼번에 몰리지 않고 일어난 간격 그대로 도착한다</text>
 <text x="20" y="306" class="t12 lbl">재접속은 /ws?lastId= 로 접속하자마자 따라잡고, 연결마다 순서 큐 뒤에 브로드캐스트를 세운다</text>
 </svg>

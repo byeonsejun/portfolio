@@ -697,6 +697,12 @@ export const projects: readonly Project[] = [
       },
       {
         kind: "image",
+        src: "/projects/traffic-room/insights.png",
+        alt: "분석 페이지 — 노선 × 시간 평균 속도 히트맵, 지금 느린 노선, 구간 상태 비율, 시간대별 돌발 발생 차트",
+        caption: "분석 페이지 — 직접 모은 24시간 기록. 경인선이 낮에 느려지고, 하루 새 상황 856건 중 출근 시간 9시가 82건으로 가장 많았다(ECharts)",
+      },
+      {
+        kind: "image",
         src: "/projects/traffic-room/fullscreen.png",
         alt: "국도17 임실 오수IC CCTV 야간 영상 전체화면",
         caption: "크게 보기 — Fullscreen API, 막힌 환경에서는 화면을 채우는 오버레이로 대신",

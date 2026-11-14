@@ -279,7 +279,7 @@ M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps)
 ### metrics
 | label | value | baseline | note |
 |---|---|---|---|
-| 테스트 | 477건 | | `pnpm test`, Test Files 45, 2026-11-14 (커밋 `146ca0a` 기준. 1차 카드 때 176건) |
+| 테스트 | 478건 | | `pnpm test`, Test Files 46, 2026-11-15 (커밋 `180bc0e` 기준, 공용 errorCode 테스트 추가. 1차 카드 때 176건) |
 | 고속도로 속도선 | 본선 8,844구간 | | 교통소통 전국 응답 383,618구간 · 75MB 실측. 표준노드링크 본선(CONNECT=0) 21,233구간 중 교통 데이터가 오는 구간. 수집 로그 `traffic ok links=8844` |
 | 지도 타일 재생성 | 5초에 1,500번 → 0 | | 2026-11-14 운영 화면에서 `Worker.prototype.postMessage` 계수, 지도를 가만히 둔 5초: 고치기 전 레이어 갱신 125 · 타일 다시 만들기 1,500 → 배포 뒤 0. `line-dasharray` 는 cross-faded-data-driven 이라 setPaintProperty 마다 소스 reload(MapLibre 6.18 `style_layer.ts`). 커밋 `7c8d5ba` |
 | 지연 재생 | 발생 시각 + 20분 | 처음 + 60분 | 서비스별 월 1,000건일 때 매시 수집 · + 60분. 한도 3,000건 승인(2026-11-13) 뒤 15분 수집(월 2,976건) · DELAY_MINUTES=20, 2,990건에서 정지. 커밋 `c804952` |

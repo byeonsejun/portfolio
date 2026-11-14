@@ -641,9 +641,9 @@ export const projects: readonly Project[] = [
     metrics: [
       {
         label: "테스트",
-        value: "477건",
+        value: "478건",
         kind: "measured",
-        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 검증 후 덮어쓰기 · 수집 스크립트 재현 포함 · 2026.11.14",
+        note: "Vitest 5 · 송출 순서 · 재접속 따라잡기 · 스케줄러 누락 · 검증 후 덮어쓰기 · 수집 스크립트 재현 포함 · 2026.11.15",
       },
       {
         label: "고속도로 속도선",

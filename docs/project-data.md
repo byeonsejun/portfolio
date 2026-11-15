@@ -16,17 +16,17 @@
 
 **역할 분담** — 판단 · 의사결정은 직접, 구현의 상당 부분은 Claude Code. 카드에 `role` 로 밝힌다.
 근거: 저장소 README 와 `docs/engineering-judgment.md`("코드는 AI가, 판단은 내가")에 본인이 이미 공개한 입장.
-커밋 783개 중 521개에 `Co-Authored-By: Claude` 가 있다(2026.10.30 기준). 결정 회고 문서를 카드의 Writeup 링크로 건다.
+커밋 791개 중 526개에 `Co-Authored-By: Claude` 가 있다(2026.11.15 기준, 2026.10.30 엔 783 중 521). 결정 회고 문서를 카드의 Writeup 링크로 건다.
 
 ### metrics
 | label | value | note |
 |---|---|---|
-| ADR | 62건 | 0001–0062, 결번 없음 |
+| ADR | 63건 | 0001–0063, 결번 없음(0063 은 2026-10-20 추가) |
 | 결제 | 2-phase | 좌석 선점 → PG 승인 → DB 확정 |
 | 환불 | 3-phase saga | 외부 IO를 DB 트랜잭션 밖으로 격리 |
 | 멱등성 | 3중 | Idempotency-Key · RefundJob 게이트 · providerEventId |
 | 아키텍처 | FSD 5-레이어 | app · widgets 13 · features 20 · entities 10 · shared |
-| 테스트 | 1,417건 | 176개 파일 · 2026.10 기준 |
+| 테스트 | 1,442건 | 178개 파일 · 2026.11 기준(`npx vitest run`, origin/main `8ef9f17`, 2026-11-15). 2026.10 엔 1,417건 · 176개 파일 |
 | 성능 계측 | 자체 RUM | Web Vitals p75 · PostgreSQL percentile_cont |
 
 ### troubleshooting — AI가 찾은 1등 가중치를 운영에 넣지 않은 이유
@@ -123,7 +123,7 @@ ADR에 남겼습니다. 운영 코드는 한 줄도 바뀌지 않았습니다.
 |---|---|---|---|
 | 판매점 | 157곳 | | 지도 핀 100% · 자동 73 · 수동 확인 84 (`stores.json` coordStatus) |
 | 하드코딩 색 | 0곳 | 80곳 | 리디자인 PR #2. 80 은 redesign spec:9, 0 은 `src` 에서 토큰 정의 파일(globals.css · palette.ts · postalStyle.ts) 밖 hex 수 |
-| 단위 테스트 | 585건 | | Vitest · 58개 파일. origin/main `d69eedc` |
+| 단위 테스트 | 586건 | | Vitest · 59개 파일. 2026-11-15 재측정(코드는 origin/main `6fc493d` 와 같음, 그 뒤는 추첨 번호 데이터 커밋뿐). 이전 585건 · 58개 파일(`d69eedc`) |
 | E2E | 60건 | | Playwright · 9개 파일 · CLS · 출처 정적 렌더 · 모바일 출처 접기 · 글꼴 로딩 순서 회귀 테스트 포함 · 실행 시 3건 조건부 skip(57 통과). origin/main `d69eedc` 에서 `playwright test --list` |
 | CLS (데스크톱) | 0.0001 | 0.19 | 운영 주소 Lighthouse 13.4.1. 모바일 0.106 → 0.0006, 데스크톱 Performance 88–90 → 97–99(PR #7 뒤 3회). 원인은 홈 `section.region-dir` 가 "내 주변 명당" 목록에 밀려난 것 |
 | 지도 첫 화면 데이터 | 503KB | 751KB | 시작 줌 11 → 10, 타일 6장 → 2장, 느린 모바일 지도 완성 −1.5s. PR #7. 재현 방법은 위 메모 |
@@ -230,7 +230,7 @@ SHOPPY(React 18 패션 커머스)를 내리고 이 자리에 올렸다(2026-11-0
 | CLS (상품 상세) | 0.003 | 0.373 | `/products/ember-sofa`, 같은 조건. 3D 영역 `dynamic()` 의 loading 에 같은 크기 자리를 줌. Performance 0.22 → 0.71 |
 | 쇼룸 fps | 59.6 | | M1 · Chromium(WebGPU) · `?tier=2&adaptive=off` · 1440×900 · 41단계 스크롤 · 하위 10% 59 · 최저 55 |
 | 3D 모델 | 20개 · 33MB | | `public/models/manifest.json` 합계. 1k 는 전부 2MB 이하(캔들 홀더만 텍스처 512로 줄임) |
-| 테스트 | 212건 | | 3차 후. `npm run check` 단위 109 · `npm run test:db` 통합 28 · `npm run test:e2e` 75. 커밋 `74fadae`, 2026-11-04 (미뤄 둔 문제 정리 후 158건 · 2차 배포 때 140건 · 1차 때 56건) |
+| 테스트 | 235건 | | 2026-11-15 재측정, origin/main `4de65d5`. `npm run test:unit` 단위 123 · `npm run test:db` 통합 33(목록 기준, 실행은 DB 필요) · `npm run test:e2e` 79(`--list`). 이전 212건(109 · 28 · 75, 커밋 `74fadae`, 2026-11-04 (미뤄 둔 문제 정리 후 158건 · 2차 배포 때 140건 · 1차 때 56건) |
 | 색 바꾸기 | 텍스처 한 장에서 천만 | | `src/three/recolor.ts` · 카탈로그 `colors`. 모델 20개 중 14개가 재질 1 · 텍스처 1장이라 부위 교체 불가 → 대표색 거리 가림막 재채색. 7개 가구, (상품, 색) 이 장바구니 · 주문 한 줄(마이그레이션 0003) |
 | 결제 | 서버 재계산 · 승인 1회 | | `src/orders/confirm.ts` · `src/payments/toss.ts`. 금액 불일치 거부(통합 · e2e), 완료 새로고침 재승인 없음(e2e), Idempotency-Key = orderId |
 | 렌더러 | WebGPU → WebGL2 → 이미지 | | `src/three/capability.ts` · `createRenderer.ts` |

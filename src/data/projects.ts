@@ -25,9 +25,9 @@ export const projects: readonly Project[] = [
     metrics: [
       {
         label: "ADR",
-        value: "62건",
+        value: "63건",
         kind: "measured",
-        note: "0001–0062, 결번 없음",
+        note: "0001–0063, 결번 없음",
       },
       {
         label: "결제",
@@ -55,9 +55,9 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "1,417건",
+        value: "1,442건",
         kind: "measured",
-        note: "176개 파일 · 2026.10 기준",
+        note: "178개 파일 · 2026.11 기준",
       },
       {
         label: "성능 계측",
@@ -169,7 +169,7 @@ export const projects: readonly Project[] = [
       },
       {
         label: "단위 테스트",
-        value: "585건",
+        value: "586건",
         kind: "measured",
         note: "Vitest · 파서는 실제 기사 HTML fixture",
       },
@@ -503,9 +503,9 @@ export const projects: readonly Project[] = [
       },
       {
         label: "테스트",
-        value: "212건",
+        value: "235건",
         kind: "measured",
-        note: "단위 109 · DB 통합 28 · Playwright 75 · 금액 위조 · 새로고침 재승인 · 끊긴 요청 재현 · 색별 장바구니 · 방 배치 포함",
+        note: "단위 123 · DB 통합 33 · Playwright 79 · 금액 위조 · 새로고침 재승인 · 끊긴 요청 재현 · 색별 장바구니 · 방 배치 포함",
       },
       {
         label: "색 바꾸기",

@@ -679,7 +679,7 @@ export const projects: readonly Project[] = [
         label: "운영비",
         value: "0원",
         kind: "structural",
-        note: "Vercel Hobby · Render 무료 · Neon 무료(덮어쓰기로 2MB 안팎) · OpenFreeMap · 수집은 국내 회선 Mac launchd",
+        note: "Vercel Hobby · Render 무료 · Neon 무료(덮어쓰기로 14MB 안팎에서 멈춤 · 한도의 3%) · OpenFreeMap · 수집은 국내 회선 Mac launchd",
       },
     ],
     screens: [

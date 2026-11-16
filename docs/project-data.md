@@ -285,7 +285,7 @@ M1에서는 쇼룸 끝까지 최고 단계를 유지했습니다(평균 59.9fps)
 | 지연 재생 | 발생 시각 + 20분 | 처음 + 60분 | 서비스별 월 1,000건일 때 매시 수집 · + 60분. 한도 3,000건 승인(2026-11-13) 뒤 15분 수집(월 2,976건) · DELAY_MINUTES=20, 2,990건에서 정지. 커밋 `c804952` |
 | 재접속 | /ws?lastId= · 연결별 순서 큐 | | `apps/realtime/src/server.ts` · `hub.ts`. 테스트 `server.test.ts` "lastId in the url is resumed before any broadcast", "a broadcast during a slow resume arrives after the resumed events". 커밋 `e8189cc`, `126ce4f` |
 | CCTV 재생 | 브라우저 직접 HLS | | `cctvType=4`, 재생목록 · chunklist · 세그먼트 모두 `Access-Control-Allow-Origin: *`. 미디어 오류는 hls.js 복구 → 새 주소 1회(10초) → 회색 "연결 안 됨"(`CctvPanel.tsx`, 커밋 `a1becf7`, `146ca0a`) |
-| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free(덮어쓰기로 2MB 안팎) · OpenFreeMap · cron-job.org |
+| 운영비 | 0원 | | Vercel Hobby · Render free(싱가포르) · Neon free(덮어쓰기로 14MB 안팎에서 멈춤 · 한도 0.5GB 의 3%). 2026-11-15 운영 DB 실측: `pg_stat_user_tables` 합계 14MB(cctvs 6.7MB · link_speeds 3.6MB = 3 × 8,844 · route_buckets 1.0MB = 104칸 × 55노선 · incidents · event_log 2.1MB, 7일). DB 전체 22MB 는 Postgres 시스템 표 포함. 이전 "2MB" 는 1시간 수집 때 교통 데이터만의 값 · OpenFreeMap · cron-job.org |
 
 스크린샷: `overview.png` · `cctv.png` · `arrival.png` 는 2026-11-14 08:07~08:10 운영 화면(https://traffic-room.vercel.app)을
 1440×900 · 2배로 찍어 1920×1200 으로 줄였다(설치된 Chrome + Playwright, CCTV H.264 재생 때문). `arrival.png` 의 "방금 들어온 상황"은

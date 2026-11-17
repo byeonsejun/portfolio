@@ -93,6 +93,10 @@ ADR에 남겼습니다. 운영 코드는 한 줄도 바뀌지 않았습니다.
 **역할 분담** — 제품 정의 · 의사결정 · 검수는 직접, 구현은 Claude Code. 카드에 `role` 로 밝힌다.
 저장소가 비공개(실서비스)라 Repository 링크가 없다.
 
+**주소** — 2026-11-17 `meisho-japan.pages.dev` → `https://lucky.sejunb.com` 으로 옮겼다(광고를 붙이려면 내 도메인 아래 주소가 필요해서. 옛 주소는 301 로 넘어간다).
+카드의 성능 수치(CLS · 데스크톱 Performance · 지도 데이터)는 옛 주소에서 잰 값이다. 새 주소는 `sejunb.com` 과 같이 한국에서 Cloudflare LAX 를 거쳐
+응답 시작이 ~0.05s → ~0.5s 로 늦고, 데스크톱 Performance 도 85–86 으로 나온다(2026.11.17, 2회). CLS 는 새 주소에서도 0.00007 · 모바일 0.0006 으로 같다.
+
 근거는 2026-10-30 에 직접 센 값(`vitest run` · `playwright test --list` · `data/curated/*.json` ·
 `out/` · `grep`)과, 그 저장소의 Claude Code 세션이 문서 · 커밋 · 테스트를 근거로 답한 내용이다.
 
@@ -123,11 +127,11 @@ ADR에 남겼습니다. 운영 코드는 한 줄도 바뀌지 않았습니다.
 |---|---|---|---|
 | 판매점 | 157곳 | | 지도 핀 100% · 자동 73 · 수동 확인 84 (`stores.json` coordStatus) |
 | 하드코딩 색 | 0곳 | 80곳 | 리디자인 PR #2. 80 은 redesign spec:9, 0 은 `src` 에서 토큰 정의 파일(globals.css · palette.ts · postalStyle.ts) 밖 hex 수 |
-| 단위 테스트 | 586건 | | Vitest · 59개 파일. 2026-11-15 재측정(코드는 origin/main `6fc493d` 와 같음, 그 뒤는 추첨 번호 데이터 커밋뿐). 이전 585건 · 58개 파일(`d69eedc`) |
-| E2E | 60건 | | Playwright · 9개 파일 · CLS · 출처 정적 렌더 · 모바일 출처 접기 · 글꼴 로딩 순서 회귀 테스트 포함 · 실행 시 3건 조건부 skip(57 통과). origin/main `d69eedc` 에서 `playwright test --list` |
+| 단위 테스트 | 591건 | | Vitest · 59개 파일. 2026-11-17 재측정(origin/main `5303b0f`, 광고 자리 · 하단 링크 테스트 추가). 이전 586건(2026-11-15 `6fc493d`) · 585건 · 58개 파일(`d69eedc`) |
+| E2E | 62건 | | Playwright · 10개 파일 · CLS · 출처 정적 렌더 · 모바일 출처 접기 · 글꼴 로딩 순서 회귀 테스트 포함 · 실행 시 3건 조건부 skip(59 통과). origin/main `5303b0f` 에서 `playwright test --list`(2026-11-17, 개인정보처리방침 2건 추가). 이전 60건 · 9개 파일(`d69eedc`) |
 | CLS (데스크톱) | 0.0001 | 0.19 | 운영 주소 Lighthouse 13.4.1. 모바일 0.106 → 0.0006, 데스크톱 Performance 88–90 → 97–99(PR #7 뒤 3회). 원인은 홈 `section.region-dir` 가 "내 주변 명당" 목록에 밀려난 것 |
 | 지도 첫 화면 데이터 | 503KB | 751KB | 시작 줌 11 → 10, 타일 6장 → 2장, 느린 모바일 지도 완성 −1.5s. PR #7. 재현 방법은 위 메모 |
-| Lighthouse | 100 · 100 · 100 | | 접근성 · 권장사항 · SEO. https://meisho-japan.pages.dev/ko, 모바일 8회 · 데스크톱 3회 모두 동일 · 13.4.1 · 2026.11.02 |
+| Lighthouse | 100 · 100 · 100 | | 접근성 · 권장사항 · SEO. https://meisho-japan.pages.dev/ko, 모바일 8회 · 데스크톱 3회 모두 동일 · 13.4.1 · 2026.11.02. 주소를 옮긴 뒤 https://lucky.sejunb.com/ko 에서 모바일 2회 · 데스크톱 2회 다시 재도 셋 다 100(2026.11.17) |
 | 운영 비용 | 0원 | | 유료 API · API 키 없음 |
 | 핀 규칙 | fail-closed | | 번지 수준 일치만 자동 · 나머지는 확인 대기 (`pipeline/geocode/resolve.ts`) |
 | 수집 | GitHub Actions cron | | 번호는 추첨 뒤 자동 커밋 · 판매점은 데이터 PR |

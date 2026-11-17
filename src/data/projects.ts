@@ -169,13 +169,13 @@ export const projects: readonly Project[] = [
       },
       {
         label: "단위 테스트",
-        value: "586건",
+        value: "591건",
         kind: "measured",
         note: "Vitest · 파서는 실제 기사 HTML fixture",
       },
       {
         label: "E2E",
-        value: "60건",
+        value: "62건",
         kind: "measured",
         note: "Playwright · CLS · 출처 정적 렌더 · 글꼴 로딩 순서 회귀 테스트 포함 · 3건은 조건부 skip",
       },
@@ -199,7 +199,7 @@ export const projects: readonly Project[] = [
         label: "Lighthouse",
         value: "100 · 100 · 100",
         kind: "measured",
-        note: "접근성 · 권장사항 · SEO · 모바일/데스크톱 11회 모두 · 13.4.1 · 2026.11.02",
+        note: "접근성 · 권장사항 · SEO · 모바일/데스크톱 11회 모두 · 13.4.1 · 2026.11.02 · 새 주소에서 2026.11.17 4회 다시 재도 같음",
       },
       {
         label: "운영 비용",
@@ -284,7 +284,7 @@ export const projects: readonly Project[] = [
       { name: "Claude Code", category: "tooling" },
     ],
     links: {
-      demo: "https://meisho-japan.pages.dev",
+      demo: "https://lucky.sejunb.com",
     },
   },
 

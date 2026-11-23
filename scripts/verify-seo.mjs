@@ -161,24 +161,29 @@ export const checks = [
     },
   },
   {
-    name: "knowsAbout 에 괄호 꼬리만 다른 중복 기술 이름이 없다",
+    name: "knowsAbout 이 이력서 스킬 10개를 정해진 순서대로 담는다",
     async run() {
       const found = await readJsonLd("index.html");
       if (found.error) return found.error;
-      const names = found.data.mainEntity?.knowsAbout;
-      if (!Array.isArray(names)) return "Person.knowsAbout 이 배열이 아니다";
-
-      /* "TypeScript" 와 "TypeScript (strict)" 는 같은 기술이다 — 꼬리 괄호를 떼고 비교한다. */
-      const stripTail = (n) => n.replace(/\s*\(.*\)$/, "").trim();
-      const open = names.filter((n) => n.trimEnd().endsWith(")"));
-      if (open.length) return `괄호로 끝나는 이름이 남았다: ${open.join(" | ")}`;
-      const seen = new Map();
-      for (const n of names) {
-        const key = stripTail(n);
-        if (seen.has(key)) return `중복: "${seen.get(key)}" 와 "${n}"`;
-        seen.set(key, n);
-      }
-      return null;
+      const actual = found.data.mainEntity?.knowsAbout;
+      /* 이력서 스킬 태그 기준의 고정 목록(src/data/site.ts KNOWS_ABOUT). 카드에서 뽑으면 백엔드 항목이 앞을 차지한다. */
+      const expected = [
+        "React",
+        "TypeScript",
+        "Next.js",
+        "JavaScript",
+        "Zustand",
+        "TanStack Query",
+        "Tailwind CSS",
+        "three.js",
+        "Vitest",
+        "Playwright",
+      ];
+      if (!Array.isArray(actual)) return "Person.knowsAbout 이 배열이 아니다";
+      if (!actual.includes("React")) return "knowsAbout 에 React 가 없다";
+      return JSON.stringify(actual) === JSON.stringify(expected)
+        ? null
+        : `knowsAbout 이 ${JSON.stringify(actual)} (기대 ${JSON.stringify(expected)})`;
     },
   },
   {

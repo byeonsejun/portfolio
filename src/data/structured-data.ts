@@ -1,6 +1,6 @@
 import type { ResolvedProject } from "@/types/project";
 
-import { GITHUB_HREF, SITE_URL } from "./site";
+import { GITHUB_HREF, KNOWS_ABOUT, SITE_URL } from "./site";
 
 /**
  * 검색엔진·AI 에게 "이 페이지는 누구의 포트폴리오이고 무슨 작업이 있는지"를
@@ -14,9 +14,6 @@ import { GITHUB_HREF, SITE_URL } from "./site";
  * 여기 평문으로 적으면 스팸 수집기가 가장 먼저 가져간다.
  */
 
-/** knowsAbout 에 싣는 기술 개수 상한. 너무 길면 신호가 아니라 잡음이 된다. */
-const KNOWS_ABOUT_LIMIT = 10;
-
 /**
  * 카드가 가리키는 대표 주소. 라이브 데모가 있으면 그것, 없으면 저장소.
  * 둘 다 없으면 undefined — 호출하는 쪽이 url 키를 아예 빼야 한다
@@ -24,25 +21,6 @@ const KNOWS_ABOUT_LIMIT = 10;
  */
 export function projectUrl(p: ResolvedProject): string | undefined {
   return p.links.demo ?? p.links.repo ?? undefined;
-}
-
-/**
- * 카드들의 techStack 이름을 처음 나온 순서대로 모은다.
- *
- * 카드마다 "TypeScript (strict)" · "Next.js 16 (App Router · static export)" 처럼
- * 설명 괄호를 붙여 적는다. 문자열이 정확히 같을 때만 거르면 같은 기술이 여러 번
- * 남아 knowsAbout 이 중복으로 채워지니, 꼬리 괄호를 떼고 같은 이름이면 합친다.
- * 상한을 자르기 전에 합쳐야 중복이 자리를 차지하지 않는다.
- */
-function collectTechNames(projects: readonly ResolvedProject[]): string[] {
-  const names = new Set<string>();
-  for (const p of projects) {
-    for (const tech of p.techStack) {
-      const base = tech.name.replace(/\s*\(.*\)$/, "").trim();
-      if (base) names.add(base);
-    }
-  }
-  return [...names].slice(0, KNOWS_ABOUT_LIMIT);
 }
 
 function buildProjectItem(p: ResolvedProject, position: number) {
@@ -80,7 +58,7 @@ export function buildProfileJsonLd(
       jobTitle: "프론트엔드 개발자",
       url: homeUrl,
       sameAs: [GITHUB_HREF],
-      knowsAbout: collectTechNames(projects),
+      knowsAbout: [...KNOWS_ABOUT],
     },
     hasPart: {
       "@type": "ItemList",

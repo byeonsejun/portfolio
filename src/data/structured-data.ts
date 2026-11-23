@@ -26,11 +26,21 @@ export function projectUrl(p: ResolvedProject): string | undefined {
   return p.links.demo ?? p.links.repo ?? undefined;
 }
 
-/** 카드들의 techStack 이름을 처음 나온 순서대로, 정확히 같은 이름만 걸러 모은다. */
+/**
+ * 카드들의 techStack 이름을 처음 나온 순서대로 모은다.
+ *
+ * 카드마다 "TypeScript (strict)" · "Next.js 16 (App Router · static export)" 처럼
+ * 설명 괄호를 붙여 적는다. 문자열이 정확히 같을 때만 거르면 같은 기술이 여러 번
+ * 남아 knowsAbout 이 중복으로 채워지니, 꼬리 괄호를 떼고 같은 이름이면 합친다.
+ * 상한을 자르기 전에 합쳐야 중복이 자리를 차지하지 않는다.
+ */
 function collectTechNames(projects: readonly ResolvedProject[]): string[] {
   const names = new Set<string>();
   for (const p of projects) {
-    for (const tech of p.techStack) names.add(tech.name);
+    for (const tech of p.techStack) {
+      const base = tech.name.replace(/\s*\(.*\)$/, "").trim();
+      if (base) names.add(base);
+    }
   }
   return [...names].slice(0, KNOWS_ABOUT_LIMIT);
 }

@@ -161,6 +161,60 @@ export const checks = [
     },
   },
   {
+    name: "knowsAbout 에 괄호 꼬리만 다른 중복 기술 이름이 없다",
+    async run() {
+      const found = await readJsonLd("index.html");
+      if (found.error) return found.error;
+      const names = found.data.mainEntity?.knowsAbout;
+      if (!Array.isArray(names)) return "Person.knowsAbout 이 배열이 아니다";
+
+      /* "TypeScript" 와 "TypeScript (strict)" 는 같은 기술이다 — 꼬리 괄호를 떼고 비교한다. */
+      const stripTail = (n) => n.replace(/\s*\(.*\)$/, "").trim();
+      const open = names.filter((n) => n.trimEnd().endsWith(")"));
+      if (open.length) return `괄호로 끝나는 이름이 남았다: ${open.join(" | ")}`;
+      const seen = new Map();
+      for (const n of names) {
+        const key = stripTail(n);
+        if (seen.has(key)) return `중복: "${seen.get(key)}" 와 "${n}"`;
+        seen.set(key, n);
+      }
+      return null;
+    },
+  },
+  {
+    name: "llms.txt 가 제목 · 요약 · 링크 · 프로젝트 6개를 담고 이메일은 없다",
+    async run() {
+      const txt = await read("llms.txt");
+      if (txt === null) return "out/llms.txt 가 없다";
+      const lines = txt.split("\n");
+
+      if (lines[0] !== "# 변세준 — 프론트엔드 개발자 포트폴리오") return `첫 줄이 ${JSON.stringify(lines[0])}`;
+      if (!lines.some((l) => l.startsWith("> ") && l.length > 2)) return "'> ' 한 줄 요약이 없다";
+      for (const url of [SITE_URL, "https://github.com/byeonsejun"]) {
+        if (!txt.includes(url)) return `${url} 가 없다`;
+      }
+
+      /* 프로젝트 이름·주소는 홈 JSON-LD 에서 가져온다. 같은 카드 데이터에서 나온 값이라 정답으로 쓴다. */
+      const found = await readJsonLd("index.html");
+      if (found.error) return found.error;
+      const items = (found.data.hasPart?.itemListElement ?? []).map((e) => e.item);
+      if (items.length !== 6) return `기준이 될 프로젝트가 ${items.length}개 (6개여야 함)`;
+
+      /* "## 이름" 으로 시작해 다음 "## " 전까지가 한 프로젝트의 구역이다. */
+      const sections = txt.split(/^## /m).slice(1);
+      for (const item of items) {
+        const section = sections.find((s) => s.split("\n")[0].trim() === item.name);
+        if (!section) return `"## ${item.name}" 제목이 없다`;
+        if (item.url && !section.includes(item.url)) return `${item.name} 아래에 ${item.url} 가 없다`;
+      }
+      if (sections.length !== items.length) return `## 제목이 ${sections.length}개 (${items.length}개여야 함)`;
+
+      if (/[^\s"@]+@[^\s"@]+\.[^\s"@]+/.test(txt)) return "llms.txt 에 이메일 주소로 보이는 문자열이 있다";
+      if (txt.includes("pages.dev")) return "llms.txt 에 pages.dev 주소가 섞였다";
+      return null;
+    },
+  },
+  {
     name: "404 에는 JSON-LD 가 없다",
     async run() {
       const html = await read("404.html");

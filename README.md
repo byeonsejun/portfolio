@@ -1,4 +1,4 @@
-# 변세준 — Frontend Portfolio
+# 변세준 | 프론트엔드 개발자 포트폴리오
 
 프로젝트 6개를 전개형 카드로 펼쳐 놓은 단일 페이지. 정적 사이트이고 서버
 런타임이 없다.
@@ -18,6 +18,8 @@ npm run dev      # predev 가 폰트·이미지 파이프라인을 먼저 돌린
 
 ```bash
 npm run build    # prebuild(폰트·이미지) → next build → postbuild(폰트 pass 2)
+npm run verify:fonts   # 빌드 후 수동 — 렌더러가 실제로 쓴 폰트 검사
+npm run verify:seo     # 빌드 후 수동 — robots · sitemap · JSON-LD · llms.txt 검사
 npm run serve    # out/ 을 brotli 로 서빙 (측정용, 8766)
 ```
 
@@ -78,6 +80,14 @@ npm run verify:fonts   # 빌드 후 로컬에서 수동 실행
 반응하도록 마크업째 박았다.
 
 팔레트에 의미가 있다 — 보라 = 내가 짠 코드 · 틸 = 외부 시스템 · 앰버 = 핵심 성과.
+
+## 검색 노출
+
+검색 결과에서 이름과 직무가 먼저 보이도록 title 을 `변세준 | 프론트엔드 개발자 포트폴리오` 로 두고, 사이트맵, 프로필 구조화 데이터(JSON-LD), `llms.txt` 를 더했다. Lighthouse SEO 는 처음부터 100 이었다. 점수를 올린 작업이 아니라, 점수가 보여 주지 않는 쪽을 채운 작업이다.
+
+robots 는 `.txt` 를 막고 `llms.txt` 만 연다. 정적 export 가 내놓는 `index.txt` 같은 RSC 페이로드가 본문과 중복으로 색인되는 것을 막으려는 설정이고, `llms.txt` 는 AI 검색이 읽으라고 만든 유일한 `.txt` 다. 이메일은 스팸 수집기를 피하려고 사이트에서 일부러 가려 둔 값이라 구조화 데이터와 `llms.txt` 에도 넣지 않았다. 구조화 데이터의 기술 목록(`knowsAbout`)도 화면에 글자로 보이는 것만 싣는다.
+
+`npm run verify:seo` 는 빌드된 `out/` 을 읽어 위 내용을 확인하는 수동 검사다. `verify:fonts` 처럼 빌드 뒤에 직접 돌리며, `postbuild` 에는 걸려 있지 않다.
 
 ## 데이터 계층
 

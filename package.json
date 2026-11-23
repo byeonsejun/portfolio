@@ -15,6 +15,7 @@
     "lighthouse": "lighthouse http://127.0.0.1:8766/ --chrome-flags='--headless=new --disable-gpu' --view",
     "postbuild": "node scripts/build-fonts.mjs --from-build",
     "verify:fonts": "node scripts/verify-fonts.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs",
     "media": "node scripts/build-images.mjs --media",
     "og": "node scripts/build-og.mjs"
   },

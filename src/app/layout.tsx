@@ -11,9 +11,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/*
+ * 검색 결과에 이름과 직무가 가장 먼저 보이도록 두 문구를 한 곳에서 정한다.
+ * title 은 "변세준" 을 검색한 사람이 첫 줄에서 본인 페이지임을 알아보게 하고,
+ * description 은 프로젝트 6개가 무엇인지(운영 중인 서비스 · 문제와 판단 · 실측)를 한 문장에 담는다.
+ * LUMEN 은 운영 중인 서비스가 아니라서 "운영 중" 묶음에 넣지 않는다.
+ * OG · twitter 도 같은 값을 써서 공유 카드와 검색 결과가 어긋나지 않게 한다.
+ */
+const TITLE = "변세준 | 프론트엔드 개발자 포트폴리오";
+const DESCRIPTION =
+  "프론트엔드 개발자 변세준의 포트폴리오입니다. 운영 중인 일본 복권 명당 지도와 실시간 고속도로 관제 화면, 3D 가구 쇼핑몰 등 6개 프로젝트를 문제와 판단, 실측 결과로 정리했습니다.";
+
 export const metadata: Metadata = {
-  title: "변세준 — Frontend Portfolio",
-  description: "프론트엔드 개발자 변세준의 포트폴리오",
+  title: TITLE,
+  description: DESCRIPTION,
   /*
    * 파비콘은 app/ 파일 컨벤션(app/icon.*) 대신 public/ + metadata 로 연결한다.
    *
@@ -49,9 +60,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: SITE_URL,
-    siteName: "변세준 — Frontend Portfolio",
-    title: "변세준 — Frontend Portfolio",
-    description: "프론트엔드 개발자 변세준의 포트폴리오",
+    siteName: "변세준 포트폴리오",
+    title: TITLE,
+    description: DESCRIPTION,
     images: [
       {
         url: "/og.png",
@@ -63,8 +74,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "변세준 — Frontend Portfolio",
-    description: "프론트엔드 개발자 변세준의 포트폴리오",
+    title: TITLE,
+    description: DESCRIPTION,
     images: ["/og.png"],
   },
 };

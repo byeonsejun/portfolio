@@ -316,3 +316,24 @@ MapLibre 6.18 `src/style/style_layer.ts` `setPaintProperty`(cross-faded-data-dri
 **Outcome**
 같은 방법으로 다시 재니 가만히 둔 5초 동안 워커 메시지가 1,500번에서 0번이 됐고, 확대·축소 직후에도 속도선이 바로 보입니다. 이 문제는 화면을 직접 오래 써 보지 않았다면 몰랐을 겁니다. 그 뒤로는 "느리다"는 느낌이 들면 고치기 전에 먼저 숫자로 재고, 고친 뒤에도 같은 숫자로 확인합니다. 회귀 테스트로 흐름 루프가 스타일 속성을 다시는 바꾸지 않는지도 막아 두었습니다.
 
+---
+
+## 7. 포트폴리오 사이트 (sejunb.com)
+
+프로젝트 카드가 아니라 사이트 자체의 기록입니다. `src/data/projects.ts` 에는 들어가지 않습니다.
+
+### 검색 노출
+
+2026-11-23, 사이트맵 · 프로필 구조화 데이터 · `llms.txt` 를 넣고 title · description 을 이름과 직무 중심으로 바꿨습니다.
+
+| 측정 | 결과 | 비고 |
+|---|---|---|
+| 기준선 (변경 전, 운영 https://sejunb.com) | SEO 100 · 100 | Lighthouse 13.4.1 모바일 2회, 2026-11-23 |
+| 변경 후 (로컬 `npm run serve`, 8766) | SEO 100 · 100 | 같은 버전 2회, 2026-11-23, 실패 감사 없음 |
+| schema.org validator (빌드된 JSON-LD) | 오류 0 · 경고 0 | validator.schema.org API |
+
+Lighthouse 원본 JSON 은 저장소에 두지 않았습니다. 점수는 처음부터 100 이라 오르지 않았습니다. 이번 작업은 점수에 잡히지 않는 부분(이름 중심 문구, 구조화 데이터, 사이트맵, `llms.txt`)을 채운 것입니다.
+
+validator 는 처음에 프로젝트 목록을 `hasPart` 아래 ItemList 로 감싼 걸 INVALID_OBJECT 로 거부했습니다. 그래서 ItemList 를 걷고 CreativeWork 배열을 `ProfilePage.hasPart` 에 직접 담았더니 오류와 경고가 모두 사라졌습니다.
+
+세 가지는 일부러 이렇게 했습니다. `.txt` 는 robots 에서 막고 `llms.txt` 만 허용합니다. 정적 export 가 만드는 RSC 페이로드(`index.txt`, `__next._full.txt`)가 중복 색인되는 걸 막기 위해서입니다. 이메일은 사이트에서 스팸 수집기를 피해 가려 둔 값이라 구조화 데이터에 넣지 않았습니다. `knowsAbout` 은 카드 techStack 순서대로 뽑으면 백엔드 항목이 앞을 채우고 React 가 빠져서, 이력서 스킬 10개로 고정했습니다.

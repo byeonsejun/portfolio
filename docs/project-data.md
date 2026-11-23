@@ -328,11 +328,11 @@ MapLibre 6.18 `src/style/style_layer.ts` `setPaintProperty`(cross-faded-data-dri
 
 | 측정 | 결과 | 비고 |
 |---|---|---|
-| 기준선 (변경 전, 운영 https://sejunb.com) | SEO 100 · 100 | Lighthouse 13.4.1 모바일 2회. `.superpowers/sdd/2026-11-23-seo-portfolio/pf-seo-before-1.json`, `-2.json` |
-| 변경 후 (로컬 `npm run serve`, 8766) | SEO 100 · 100 | 같은 버전 2회, 실패 감사 없음. `pf-seo-after-1.json`, `-2.json` |
+| 기준선 (변경 전, 운영 https://sejunb.com) | SEO 100 · 100 | Lighthouse 13.4.1 모바일 2회, 2026-11-23 |
+| 변경 후 (로컬 `npm run serve`, 8766) | SEO 100 · 100 | 같은 버전 2회, 2026-11-23, 실패 감사 없음 |
 | schema.org validator (빌드된 JSON-LD) | 오류 0 · 경고 0 | validator.schema.org API |
 
-점수는 처음부터 100 이라 오르지 않았습니다. 이번 작업은 점수에 잡히지 않는 부분(이름 중심 문구, 구조화 데이터, 사이트맵, `llms.txt`)을 채운 것입니다.
+Lighthouse 원본 JSON 은 저장소에 두지 않았습니다. 점수는 처음부터 100 이라 오르지 않았습니다. 이번 작업은 점수에 잡히지 않는 부분(이름 중심 문구, 구조화 데이터, 사이트맵, `llms.txt`)을 채운 것입니다.
 
 validator 는 처음에 프로젝트 목록을 `hasPart` 아래 ItemList 로 감싼 걸 INVALID_OBJECT 로 거부했습니다. 그래서 ItemList 를 걷고 CreativeWork 배열을 `ProfilePage.hasPart` 에 직접 담았더니 오류와 경고가 모두 사라졌습니다.
 

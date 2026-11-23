@@ -114,7 +114,7 @@ export const checks = [
     },
   },
   {
-    name: "홈 JSON-LD 가 ProfilePage > Person 과 프로젝트 6개 목록을 담는다",
+    name: "홈 JSON-LD 가 ProfilePage > Person 과 workExample 프로젝트 6개를 담는다",
     async run() {
       const found = await readJsonLd("index.html");
       if (found.error) return found.error;
@@ -139,17 +139,17 @@ export const checks = [
       if (!person.sameAs?.includes("https://github.com/byeonsejun")) return "Person.sameAs 에 GitHub 주소가 없다";
       if (!Array.isArray(person.knowsAbout) || person.knowsAbout.length === 0) return "Person.knowsAbout 이 비었다";
 
-      const list = data.hasPart;
-      if (list?.["@type"] !== "ItemList") return "hasPart 가 ItemList 가 아니다";
-      const items = list.itemListElement ?? [];
+      /*
+       * 프로젝트 목록은 Person.workExample. ProfilePage.hasPart 아래 ItemList 는
+       * schema.org validator 가 거부하므로(INVALID_OBJECT) 다시 생기면 안 된다.
+       */
+      if ("hasPart" in data) return "ProfilePage.hasPart 가 남아 있다 (validator 가 ItemList 를 거부함)";
+      const items = person.workExample;
+      if (!Array.isArray(items)) return "Person.workExample 이 배열이 아니다";
       if (items.length !== 6) return `프로젝트 항목이 ${items.length}개 (6개여야 함)`;
-      for (const [i, entry] of items.entries()) {
-        if (entry["@type"] !== "ListItem" || entry.position !== i + 1) {
-          return `${i + 1}번째 항목의 ListItem/position 이 틀렸다`;
-        }
-        const item = entry.item;
-        if (item?.["@type"] !== "CreativeWork") return `${i + 1}번째 item 이 CreativeWork 가 아니다`;
-        if (!item.name) return `${i + 1}번째 item.name 이 비었다`;
+      for (const [i, item] of items.entries()) {
+        if (item["@type"] !== "CreativeWork") return `${i + 1}번째 workExample 이 CreativeWork 가 아니다`;
+        if (!item.name) return `${i + 1}번째 workExample.name 이 비었다`;
         if ("url" in item && !item.url) return `${item.name} 의 url 키가 있는데 값이 비었다`;
       }
 
@@ -202,7 +202,7 @@ export const checks = [
       /* 프로젝트 이름·주소는 홈 JSON-LD 에서 가져온다. 같은 카드 데이터에서 나온 값이라 정답으로 쓴다. */
       const found = await readJsonLd("index.html");
       if (found.error) return found.error;
-      const items = (found.data.hasPart?.itemListElement ?? []).map((e) => e.item);
+      const items = found.data.mainEntity?.workExample ?? [];
       if (items.length !== 6) return `기준이 될 프로젝트가 ${items.length}개 (6개여야 함)`;
 
       /* "## 이름" 으로 시작해 다음 "## " 전까지가 한 프로젝트의 구역이다. */

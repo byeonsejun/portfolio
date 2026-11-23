@@ -23,21 +23,25 @@ export function projectUrl(p: ResolvedProject): string | undefined {
   return p.links.demo ?? p.links.repo ?? undefined;
 }
 
-function buildProjectItem(p: ResolvedProject, position: number) {
+/**
+ * 프로젝트 하나를 CreativeWork 로. Person.workExample 의 원소다.
+ *
+ * 처음엔 ProfilePage.hasPart 아래 ItemList 로 감쌌는데 schema.org validator 가
+ * 거부했다 — hasPart 는 CreativeWork 나 Role 만 받는다(INVALID_OBJECT).
+ * "이 사람이 만든 작업물" 이라는 뜻에도 Person.workExample 이 더 맞아서,
+ * 순서 정보(ListItem.position)는 버리고 배열 순서(카드 순서)로 갈음한다.
+ */
+function buildWorkExample(p: ResolvedProject) {
   const url = projectUrl(p);
   const repo = p.links.repo;
 
   return {
-    "@type": "ListItem",
-    position,
-    item: {
-      "@type": "CreativeWork",
-      name: p.name,
-      description: p.tagline,
-      ...(url ? { url } : {}),
-      /* 데모가 url 로 나갔을 때만 저장소를 sameAs 로 덧붙인다. 같은 주소를 두 번 쓰지 않는다. */
-      ...(repo && repo !== url ? { sameAs: repo } : {}),
-    },
+    "@type": "CreativeWork",
+    name: p.name,
+    description: p.tagline,
+    ...(url ? { url } : {}),
+    /* 데모가 url 로 나갔을 때만 저장소를 sameAs 로 덧붙인다. 같은 주소를 두 번 쓰지 않는다. */
+    ...(repo && repo !== url ? { sameAs: repo } : {}),
   };
 }
 
@@ -59,10 +63,7 @@ export function buildProfileJsonLd(
       url: homeUrl,
       sameAs: [GITHUB_HREF],
       knowsAbout: [...KNOWS_ABOUT],
-    },
-    hasPart: {
-      "@type": "ItemList",
-      itemListElement: projects.map((p, i) => buildProjectItem(p, i + 1)),
+      workExample: projects.map(buildWorkExample),
     },
   };
 }
@@ -70,7 +71,7 @@ export function buildProfileJsonLd(
 /**
  * <script> 안에 그대로 넣을 문자열.
  * 카드 문구에 "</script>" 가 섞이면 태그가 거기서 닫혀 버리니 `<` 를 유니코드로
- * 바꾼다. JSON 파서는 < 를 원래 문자로 읽으므로 의미는 그대로다.
+ * 바꾼다. JSON 파서는 \u003c 를 원래 문자로 읽으므로 의미는 그대로다.
  */
 export function toJsonLdScript(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");

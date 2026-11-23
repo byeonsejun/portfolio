@@ -11,9 +11,9 @@ export const dynamic = "force-static";
  * 크롤러에게 "정본 주소는 이것" 이라고 한 번 더 말해 주기 위해서다. pages.dev
  * 주소가 한동안 같이 색인됐던 적이 있어서, 정본 URL 목록을 파일로 남겨 둔다.
  *
- * lastModified 는 빌드 시각이다. 내용이 바뀌면 곧 재빌드·재배포이므로
- * "마지막으로 배포된 때" 가 곧 "마지막으로 바뀐 때" 와 같다.
+ * lastModified 는 일부러 뺀다. 빌드 시각을 넣으면 내용이 그대로여도 재빌드마다
+ * 값이 바뀌어서, 크롤러가 갱신 날짜를 믿지 않게 된다. 선택 항목이라 없어도 된다.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: `${SITE_URL}/`, lastModified: new Date() }];
+  return [{ url: `${SITE_URL}/` }];
 }

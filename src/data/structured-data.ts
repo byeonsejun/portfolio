@@ -16,11 +16,14 @@ import { GITHUB_HREF, KNOWS_ABOUT, SITE_URL } from "./site";
 
 /**
  * 카드가 가리키는 대표 주소. 라이브 데모가 있으면 그것, 없으면 저장소.
+ * demoHiddenReason 이 있으면 데모는 화면에서 일부러 내린 링크이므로 없는 것으로
+ * 본다 — 화면에 안 보이는 주소를 구조화 데이터에만 실으면 안 된다.
  * 둘 다 없으면 undefined — 호출하는 쪽이 url 키를 아예 빼야 한다
  * (빈 문자열 url 은 구조화 데이터 검사에서 오류로 잡힌다).
  */
 export function projectUrl(p: ResolvedProject): string | undefined {
-  return p.links.demo ?? p.links.repo ?? undefined;
+  const demo = p.links.demoHiddenReason ? undefined : p.links.demo;
+  return demo ?? p.links.repo ?? undefined;
 }
 
 /**

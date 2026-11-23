@@ -20,20 +20,16 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+/*
+ * 사이트 주소 · GitHub · 기술 목록은 src/data/site.ts 한 곳에서만 정한다. 여기서
+ * 다시 적으면 값이 바뀔 때 검사가 옛 값을 정답이라고 우긴다. Node 24 는 .ts 의
+ * 타입을 지워 바로 실행하고, site.ts 는 import 가 없어서 그대로 읽힌다.
+ */
+import { GITHUB_HREF, KNOWS_ABOUT, SITE_URL } from "../src/data/site.ts";
+
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "out");
 
-/*
- * 사이트 주소는 src/data/site.ts 한 곳에서만 정한다. 여기서 문자열로 다시
- * 적으면 도메인이 바뀔 때 검사가 옛 값을 정답이라고 우긴다. TS 파일이라
- * 직접 import 할 수 없어서 상수 선언 줄만 읽어 온다.
- */
-const siteSource = await readFile(path.join(ROOT, "src/data/site.ts"), "utf8");
-const SITE_URL = siteSource.match(/export const SITE_URL\s*=\s*"([^"]+)"/)?.[1];
-if (!SITE_URL) {
-  console.error("[verify-seo] src/data/site.ts 에서 SITE_URL 을 못 읽었다.");
-  process.exit(1);
-}
 
 /** out/ 아래 파일을 문자열로 읽는다. 없으면 null — 존재 여부도 검사 대상이라 던지지 않는다. */
 async function read(rel) {
@@ -136,7 +132,7 @@ export const checks = [
           return `Person.${key} 가 ${JSON.stringify(person[key])} (기대 ${JSON.stringify(value)})`;
         }
       }
-      if (!person.sameAs?.includes("https://github.com/byeonsejun")) return "Person.sameAs 에 GitHub 주소가 없다";
+      if (!person.sameAs?.includes(GITHUB_HREF)) return "Person.sameAs 에 GitHub 주소가 없다";
       if (!Array.isArray(person.knowsAbout) || person.knowsAbout.length === 0) return "Person.knowsAbout 이 비었다";
 
       /*
@@ -162,33 +158,32 @@ export const checks = [
     },
   },
   {
-    name: "knowsAbout 이 이력서 스킬 10개를 정해진 순서대로 담는다",
+    name: "knowsAbout 이 site.ts 목록과 같고, 모든 항목이 화면 본문에 글자로 나온다",
     async run() {
       const found = await readJsonLd("index.html");
       if (found.error) return found.error;
       const actual = found.data.mainEntity?.knowsAbout;
-      /* 이력서 스킬 태그 기준의 고정 목록(src/data/site.ts KNOWS_ABOUT). 카드에서 뽑으면 백엔드 항목이 앞을 차지한다. */
-      const expected = [
-        "React",
-        "TypeScript",
-        "Next.js",
-        "JavaScript",
-        "Zustand",
-        "TanStack Query",
-        "Tailwind CSS",
-        "three.js",
-        "Vitest",
-        "Playwright",
-      ];
       if (!Array.isArray(actual)) return "Person.knowsAbout 이 배열이 아니다";
       if (!actual.includes("React")) return "knowsAbout 에 React 가 없다";
-      return JSON.stringify(actual) === JSON.stringify(expected)
-        ? null
-        : `knowsAbout 이 ${JSON.stringify(actual)} (기대 ${JSON.stringify(expected)})`;
+      if (JSON.stringify(actual) !== JSON.stringify(KNOWS_ABOUT)) {
+        return `knowsAbout 이 ${JSON.stringify(actual)} (기대 ${JSON.stringify(KNOWS_ABOUT)})`;
+      }
+
+      /*
+       * 구조화 데이터에만 있고 화면에 없는 정보는 검색엔진이 불일치로 본다.
+       * <script>(JSON-LD · RSC 페이로드)와 <style> 을 걷어 내고 태그를 지운 뒤,
+       * 대소문자를 구분해 본문 글자에 그대로 있는지 확인한다.
+       */
+      const html = await read("index.html");
+      const visible = html
+        .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, " ")
+        .replace(/<[^>]*>/g, " ");
+      const absent = KNOWS_ABOUT.filter((skill) => !visible.includes(skill));
+      return absent.length ? `화면 본문에 없는 knowsAbout 항목: ${absent.join(", ")}` : null;
     },
   },
   {
-    name: "llms.txt 가 제목 · 요약 · 링크 · 프로젝트 6개를 담고 이메일은 없다",
+    name: "llms.txt 가 제목 · 요약 · 링크 · `## 프로젝트` 6개 항목(이름 · 주소 · 기술)을 담고 이메일은 없다",
     async run() {
       const txt = await read("llms.txt");
       if (txt === null) return "out/llms.txt 가 없다";
@@ -196,24 +191,32 @@ export const checks = [
 
       if (lines[0] !== "# 변세준 — 프론트엔드 개발자 포트폴리오") return `첫 줄이 ${JSON.stringify(lines[0])}`;
       if (!lines.some((l) => l.startsWith("> ") && l.length > 2)) return "'> ' 한 줄 요약이 없다";
-      for (const url of [SITE_URL, "https://github.com/byeonsejun"]) {
+      for (const url of [SITE_URL, GITHUB_HREF]) {
         if (!txt.includes(url)) return `${url} 가 없다`;
       }
 
       /* 프로젝트 이름·주소는 홈 JSON-LD 에서 가져온다. 같은 카드 데이터에서 나온 값이라 정답으로 쓴다. */
       const found = await readJsonLd("index.html");
       if (found.error) return found.error;
-      const items = found.data.hasPart ?? [];
-      if (items.length !== 6) return `기준이 될 프로젝트가 ${items.length}개 (6개여야 함)`;
+      const projects = found.data.hasPart ?? [];
+      if (projects.length !== 6) return `기준이 될 프로젝트가 ${projects.length}개 (6개여야 함)`;
 
-      /* "## 이름" 으로 시작해 다음 "## " 전까지가 한 프로젝트의 구역이다. */
-      const sections = txt.split(/^## /m).slice(1);
-      for (const item of items) {
-        const section = sections.find((s) => s.split("\n")[0].trim() === item.name);
-        if (!section) return `"## ${item.name}" 제목이 없다`;
-        if (item.url && !section.includes(item.url)) return `${item.name} 아래에 ${item.url} 가 없다`;
+      /* "## 프로젝트" 는 정확히 하나, 그 아래 다음 "## " 전까지가 항목 구역이다. */
+      const headings = lines.filter((l) => l.startsWith("## "));
+      if (headings.length !== 1 || headings[0] !== "## 프로젝트") {
+        return `## 제목이 ${JSON.stringify(headings)} ("## 프로젝트" 하나여야 함)`;
       }
-      if (sections.length !== items.length) return `## 제목이 ${sections.length}개 (${items.length}개여야 함)`;
+      const after = lines.slice(lines.indexOf("## 프로젝트") + 1);
+      const next = after.findIndex((l) => l.startsWith("## "));
+      const items = (next === -1 ? after : after.slice(0, next)).filter((l) => l.startsWith("- "));
+      if (items.length !== projects.length) return `프로젝트 항목이 ${items.length}개 (${projects.length}개여야 함)`;
+
+      for (const project of projects) {
+        const item = items.find((l) => l.includes(project.name));
+        if (!item) return `${project.name} 항목이 없다`;
+        if (project.url && !item.includes(project.url)) return `${project.name} 항목에 ${project.url} 가 없다`;
+        if (!item.includes("기술:")) return `${project.name} 항목에 "기술:" 이 없다`;
+      }
 
       if (/[^\s"@]+@[^\s"@]+\.[^\s"@]+/.test(txt)) return "llms.txt 에 이메일 주소로 보이는 문자열이 있다";
       if (txt.includes("pages.dev")) return "llms.txt 에 pages.dev 주소가 섞였다";

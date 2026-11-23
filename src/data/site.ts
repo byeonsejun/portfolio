@@ -11,20 +11,22 @@ export const GITHUB_HREF = "https://github.com/byeonsejun";
 export const SITE_URL = "https://sejunb.com";
 
 /**
- * 구조화 데이터 Person.knowsAbout 에 싣는 기술. 이력서 스킬 태그 기준, 본인이 직접 정한 목록이다.
+ * 구조화 데이터 Person.knowsAbout 에 싣는 기술. 본인이 직접 정한 목록이다.
+ *
+ * 화면에 글자로 보이는 기술만 싣는다. 구조화 데이터에만 있고 화면에는 없는
+ * 정보는 검색엔진이 불일치로 본다. scripts/verify-seo.mjs 가 이 목록의 항목이
+ * 빌드된 홈의 본문 텍스트에 모두 나오는지 확인한다.
  *
  * 카드의 techStack 에서 뽑지 않고 고정한다. 카드 techStack 은 프로젝트마다 순서가
  * 달라서, 앞에서부터 자르면 백엔드 항목(Prisma · pgvector 등)이 먼저 차지해
  * 프론트엔드 개발자의 핵심 기술(React · Tailwind CSS …)이 밀려난다.
- * 스킬이 바뀌면 여기만 고친다.
+ * verify-seo 가 이 파일을 직접 import 하므로 값을 고치면 검사도 같이 따라온다.
  */
 export const KNOWS_ABOUT = [
   "React",
   "TypeScript",
   "Next.js",
-  "JavaScript",
   "Zustand",
-  "TanStack Query",
   "Tailwind CSS",
   "three.js",
   "Vitest",

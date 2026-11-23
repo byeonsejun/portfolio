@@ -24,14 +24,16 @@ export function projectUrl(p: ResolvedProject): string | undefined {
 }
 
 /**
- * 프로젝트 하나를 CreativeWork 로. Person.workExample 의 원소다.
+ * 프로젝트 하나를 CreativeWork 로. ProfilePage.hasPart 배열의 원소다.
  *
- * 처음엔 ProfilePage.hasPart 아래 ItemList 로 감쌌는데 schema.org validator 가
- * 거부했다 — hasPart 는 CreativeWork 나 Role 만 받는다(INVALID_OBJECT).
- * "이 사람이 만든 작업물" 이라는 뜻에도 Person.workExample 이 더 맞아서,
- * 순서 정보(ListItem.position)는 버리고 배열 순서(카드 순서)로 갈음한다.
+ * 자리 선택에는 두 번 막혔다. ItemList 로 감싸 hasPart 에 넣으면 schema.org
+ * validator 가 거부한다(hasPart 는 CreativeWork 나 Role 만 받는다, INVALID_OBJECT).
+ * Person.workExample 로 옮기면 오류는 없지만 workExample 은 CreativeWork 의
+ * 속성이라 Person 에서는 UNKNOWN_FIELD 경고가 프로젝트마다 붙는다.
+ * 그래서 CreativeWork 를 래퍼 없이 hasPart 에 직접 둔다 — 오류도 경고도 없다.
+ * 순서 정보(ListItem.position)는 배열 순서(카드 순서)로 갈음한다.
  */
-function buildWorkExample(p: ResolvedProject) {
+function buildCreativeWork(p: ResolvedProject) {
   const url = projectUrl(p);
   const repo = p.links.repo;
 
@@ -63,8 +65,8 @@ export function buildProfileJsonLd(
       url: homeUrl,
       sameAs: [GITHUB_HREF],
       knowsAbout: [...KNOWS_ABOUT],
-      workExample: projects.map(buildWorkExample),
     },
+    hasPart: projects.map(buildCreativeWork),
   };
 }
 

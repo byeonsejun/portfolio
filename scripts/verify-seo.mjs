@@ -221,6 +221,48 @@ export const checks = [
     },
   },
   {
+    name: "홈 메타가 이름과 직무로 시작하고 title · og · twitter · canonical 이 맞다",
+    async run() {
+      const html = await read("index.html");
+      if (html === null) return "out/index.html 이 없다";
+
+      /* 속성 순서가 달라도 잡도록 태그를 통째로 찾은 뒤 content 만 꺼낸다. */
+      const decode = (s) =>
+        s.replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+      const metaContent = (attr, key) => {
+        const tag = html
+          .match(/<meta\b[^>]*>/g)
+          ?.find((t) => new RegExp(`\\b${attr}="${key}"`).test(t));
+        const value = tag?.match(/\bcontent="([^"]*)"/)?.[1];
+        return value === undefined ? null : decode(value);
+      };
+
+      const TITLE = "변세준 | 프론트엔드 개발자 포트폴리오";
+      const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
+      if (title === undefined) return "<title> 이 없다";
+      if (decode(title) !== TITLE) return `<title> 이 ${JSON.stringify(decode(title))} (기대 ${JSON.stringify(TITLE)})`;
+
+      const description = metaContent("name", "description");
+      if (description === null) return "meta description 이 없다";
+      if (!description.startsWith("변세준") && !description.startsWith("프론트엔드")) {
+        return `description 이 이름·직무로 시작하지 않는다: ${JSON.stringify(description.slice(0, 20))}`;
+      }
+      if (description.length < 80 || description.length > 160) {
+        return `description 이 ${description.length}자 (80~160자여야 함)`;
+      }
+
+      for (const [attr, key] of [["property", "og:title"], ["name", "twitter:title"]]) {
+        const value = metaContent(attr, key);
+        if (value !== TITLE) return `${key} 가 ${JSON.stringify(value)} (title 과 같아야 함)`;
+      }
+
+      const canonical = html.match(/<link\b[^>]*>/g)?.find((t) => /\brel="canonical"/.test(t));
+      const href = canonical?.match(/\bhref="([^"]*)"/)?.[1];
+      if (href !== `${SITE_URL}/`) return `canonical 이 ${JSON.stringify(href)} (기대 ${JSON.stringify(`${SITE_URL}/`)})`;
+      return null;
+    },
+  },
+  {
     name: "404 에는 JSON-LD 가 없다",
     async run() {
       const html = await read("404.html");

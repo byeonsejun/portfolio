@@ -18,6 +18,8 @@ npm run dev      # predev 가 폰트·이미지 파이프라인을 먼저 돌린
 
 ```bash
 npm run build    # prebuild(폰트·이미지) → next build → postbuild(폰트 pass 2)
+npm run verify:fonts   # 빌드 후 수동 — 렌더러가 실제로 쓴 폰트 검사
+npm run verify:seo     # 빌드 후 수동 — robots · sitemap · JSON-LD · llms.txt 검사
 npm run serve    # out/ 을 brotli 로 서빙 (측정용, 8766)
 ```
 
@@ -81,9 +83,11 @@ npm run verify:fonts   # 빌드 후 로컬에서 수동 실행
 
 ## 검색 노출
 
-검색 결과에서 이름과 직무가 먼저 보이도록 title 을 `변세준 | 프론트엔드 개발자 포트폴리오` 로 두고, 사이트맵 · 프로필 구조화 데이터(JSON-LD) · `llms.txt` 를 더했습니다. Lighthouse SEO 는 처음부터 100 이었으니 점수를 올린 작업은 아니고, 점수가 보여 주지 않는 쪽을 채웠습니다.
+검색 결과에서 이름과 직무가 먼저 보이도록 title 을 `변세준 | 프론트엔드 개발자 포트폴리오` 로 두고, 사이트맵, 프로필 구조화 데이터(JSON-LD), `llms.txt` 를 더했다. Lighthouse SEO 는 처음부터 100 이었다. 점수를 올린 작업이 아니라, 점수가 보여 주지 않는 쪽을 채운 작업이다.
 
-robots 는 `.txt` 를 막고 `llms.txt` 만 엽니다. 정적 export 가 내놓는 `index.txt` 같은 RSC 페이로드가 본문과 중복으로 색인되는 걸 막으려는 것이고, `llms.txt` 는 AI 검색이 읽으라고 만든 유일한 `.txt` 입니다. 이메일은 스팸 수집기를 피하려고 사이트에서 일부러 가려 둔 값이라 구조화 데이터와 `llms.txt` 에도 넣지 않았습니다. `npm run verify:seo` 가 빌드 결과를 읽어 이 약속들을 배포 전에 확인합니다.
+robots 는 `.txt` 를 막고 `llms.txt` 만 연다. 정적 export 가 내놓는 `index.txt` 같은 RSC 페이로드가 본문과 중복으로 색인되는 것을 막으려는 설정이고, `llms.txt` 는 AI 검색이 읽으라고 만든 유일한 `.txt` 다. 이메일은 스팸 수집기를 피하려고 사이트에서 일부러 가려 둔 값이라 구조화 데이터와 `llms.txt` 에도 넣지 않았다. 구조화 데이터의 기술 목록(`knowsAbout`)도 화면에 글자로 보이는 것만 싣는다.
+
+`npm run verify:seo` 는 빌드된 `out/` 을 읽어 위 내용을 확인하는 수동 검사다. `verify:fonts` 처럼 빌드 뒤에 직접 돌리며, `postbuild` 에는 걸려 있지 않다.
 
 ## 데이터 계층
 

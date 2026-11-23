@@ -44,6 +44,22 @@ async function read(rel) {
   }
 }
 
+/**
+ * out/ 의 HTML 에서 application/ld+json 한 덩어리를 꺼내 파싱한다.
+ * 없거나 깨졌으면 { error } — 검사마다 같은 분기를 반복하지 않으려고 모았다.
+ */
+async function readJsonLd(rel) {
+  const html = await read(rel);
+  if (html === null) return { error: `out/${rel} 가 없다` };
+  const match = html.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
+  if (!match) return { error: `out/${rel} 에 application/ld+json 이 없다` };
+  try {
+    return { raw: match[1], data: JSON.parse(match[1]) };
+  } catch (e) {
+    return { error: `JSON-LD 가 JSON 으로 파싱되지 않는다: ${e.message}` };
+  }
+}
+
 /** robots.txt 에서 `Allow:` 값만 뽑는다. */
 const allowRules = (robots) =>
   robots
@@ -87,6 +103,69 @@ export const checks = [
       if (count !== 1) return `${home} 가 ${count}개 (정확히 1개여야 함)`;
       if (xml.includes("pages.dev")) return "sitemap.xml 에 pages.dev 주소가 섞였다";
       return null;
+    },
+  },
+  {
+    name: "robots.txt 에 pages.dev 주소가 섞이지 않는다",
+    async run() {
+      const robots = await read("robots.txt");
+      if (robots === null) return "out/robots.txt 가 없다";
+      return robots.includes("pages.dev") ? "robots.txt 에 pages.dev 주소가 섞였다" : null;
+    },
+  },
+  {
+    name: "홈 JSON-LD 가 ProfilePage > Person 과 프로젝트 6개 목록을 담는다",
+    async run() {
+      const found = await readJsonLd("index.html");
+      if (found.error) return found.error;
+      const { raw, data } = found;
+
+      if (data["@context"] !== "https://schema.org") return `@context 가 ${data["@context"]}`;
+      if (data["@type"] !== "ProfilePage") return `@type 이 ${data["@type"]}`;
+
+      const person = data.mainEntity;
+      if (person?.["@type"] !== "Person") return "mainEntity 가 Person 이 아니다";
+      const expected = {
+        name: "변세준",
+        alternateName: "BYUN SEJUN",
+        jobTitle: "프론트엔드 개발자",
+        url: `${SITE_URL}/`,
+      };
+      for (const [key, value] of Object.entries(expected)) {
+        if (person[key] !== value) {
+          return `Person.${key} 가 ${JSON.stringify(person[key])} (기대 ${JSON.stringify(value)})`;
+        }
+      }
+      if (!person.sameAs?.includes("https://github.com/byeonsejun")) return "Person.sameAs 에 GitHub 주소가 없다";
+      if (!Array.isArray(person.knowsAbout) || person.knowsAbout.length === 0) return "Person.knowsAbout 이 비었다";
+
+      const list = data.hasPart;
+      if (list?.["@type"] !== "ItemList") return "hasPart 가 ItemList 가 아니다";
+      const items = list.itemListElement ?? [];
+      if (items.length !== 6) return `프로젝트 항목이 ${items.length}개 (6개여야 함)`;
+      for (const [i, entry] of items.entries()) {
+        if (entry["@type"] !== "ListItem" || entry.position !== i + 1) {
+          return `${i + 1}번째 항목의 ListItem/position 이 틀렸다`;
+        }
+        const item = entry.item;
+        if (item?.["@type"] !== "CreativeWork") return `${i + 1}번째 item 이 CreativeWork 가 아니다`;
+        if (!item.name) return `${i + 1}번째 item.name 이 비었다`;
+        if ("url" in item && !item.url) return `${item.name} 의 url 키가 있는데 값이 비었다`;
+      }
+
+      /* 이메일은 사이트에서 일부러 가려 둔 값이다. 구조화 데이터로 새면 가린 의미가 없다. */
+      if (/[^\s"@]+@[^\s"@]+\.[^\s"@]+/.test(raw)) return "JSON-LD 에 이메일 주소로 보이는 문자열이 있다";
+      if (raw.includes("pages.dev")) return "JSON-LD 에 pages.dev 주소가 섞였다";
+      if (raw.includes("<")) return "JSON-LD 에 이스케이프 안 된 < 가 있다 (</script> 로 깨질 수 있음)";
+      return null;
+    },
+  },
+  {
+    name: "404 에는 JSON-LD 가 없다",
+    async run() {
+      const html = await read("404.html");
+      if (html === null) return "out/404.html 이 없다";
+      return html.includes("application/ld+json") ? "404.html 이 홈의 JSON-LD 를 상속했다" : null;
     },
   },
 ];

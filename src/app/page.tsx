@@ -5,6 +5,7 @@ import { Hero } from "@/components/site/hero";
 import { SiteHeader } from "@/components/site/site-header";
 import { ProjectCard } from "@/components/works/project-card";
 import { resolvedProjects } from "@/data/resolve";
+import { buildProfileJsonLd, toJsonLdScript } from "@/data/structured-data";
 
 /**
  * 정본 URL.
@@ -37,6 +38,17 @@ export default function Home() {
 
   return (
     <>
+      {/*
+        JSON-LD 는 홈에만 둔다. layout 에 두면 404 도 "변세준 프로필 페이지"라고
+        주장하게 된다. canonical 을 page 에 둔 이유와 같다.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: toJsonLdScript(buildProfileJsonLd(resolvedProjects)),
+        }}
+      />
+
       <SiteHeader items={navItems} />
 
       <main className="mx-auto w-full max-w-5xl px-4 sm:px-6">

@@ -262,6 +262,9 @@ export const checks = [
       const canonical = html.match(/<link\b[^>]*>/g)?.find((t) => /\brel="canonical"/.test(t));
       const href = canonical?.match(/\bhref="([^"]*)"/)?.[1];
       if (href !== `${SITE_URL}/`) return `canonical 이 ${JSON.stringify(href)} (기대 ${JSON.stringify(`${SITE_URL}/`)})`;
+
+      /* 네이버 소유 확인 태그. 지워지면 서치어드바이저 확인이 풀린다. */
+      if (!metaContent("name", "naver-site-verification")) return "naver-site-verification 메타가 없다";
       return null;
     },
   },

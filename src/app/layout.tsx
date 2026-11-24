@@ -78,6 +78,14 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     images: ["/og.png"],
   },
+  /*
+   * 네이버 서치어드바이저 소유 확인용 메타 태그.
+   * 구글은 sejunb.com 도메인 속성을 DNS TXT 로 확인해서 페이지에 넣을 것이 없다.
+   * 네이버는 HTML 태그나 파일만 받으니 여기 둔다. 값을 지우면 소유 확인이 풀린다.
+   */
+  verification: {
+    other: { "naver-site-verification": "5441112dcaa5f1571ff2103f65735a95bd8e128c" },
+  },
 };
 
 /*

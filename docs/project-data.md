@@ -330,10 +330,13 @@ MapLibre 6.18 `src/style/style_layer.ts` `setPaintProperty`(cross-faded-data-dri
 |---|---|---|
 | 기준선 (변경 전, 운영 https://sejunb.com) | SEO 100 · 100 | Lighthouse 13.4.1 모바일 2회, 2026-11-23 |
 | 변경 후 (로컬 `npm run serve`, 8766) | SEO 100 · 100 | 같은 버전 2회, 2026-11-23, 실패 감사 없음 |
-| schema.org validator (빌드된 JSON-LD) | 오류 0 · 경고 0 | validator.schema.org API |
+| 변경 후 (운영 https://sejunb.com, 배포 뒤) | SEO 100 · 100 | 같은 버전 2회, 2026-11-23, 크롤링 · robots · canonical · 메타 감사 모두 통과 |
+| schema.org validator (운영 주소) | 오류 0 · 경고 0 | validator.schema.org API, 2026-11-23 |
 
 Lighthouse 원본 JSON 은 저장소에 두지 않았습니다. 점수는 처음부터 100 이라 오르지 않았습니다. 이번 작업은 점수에 잡히지 않는 부분(이름 중심 문구, 구조화 데이터, 사이트맵, `llms.txt`)을 채운 것입니다.
 
 validator 는 처음에 프로젝트 목록을 `hasPart` 아래 ItemList 로 감싼 걸 INVALID_OBJECT 로 거부했습니다. 그래서 ItemList 를 걷고 CreativeWork 배열을 `ProfilePage.hasPart` 에 직접 담았더니 오류와 경고가 모두 사라졌습니다.
 
-세 가지는 일부러 이렇게 했습니다. `.txt` 는 robots 에서 막고 `llms.txt` 만 허용합니다. 정적 export 가 만드는 RSC 페이로드(`index.txt`, `__next._full.txt`)가 중복 색인되는 걸 막기 위해서입니다. 이메일은 사이트에서 스팸 수집기를 피해 가려 둔 값이라 구조화 데이터에 넣지 않았습니다. `knowsAbout` 은 카드 techStack 순서대로 뽑으면 백엔드 항목이 앞을 채우고 React 가 빠져서, 이력서 스킬 10개로 고정했습니다.
+세 가지는 일부러 이렇게 했습니다. `.txt` 는 robots 에서 막고 `llms.txt` 만 허용합니다. 정적 export 가 만드는 RSC 페이로드(`index.txt`, `__next._full.txt`)가 중복 색인되는 걸 막기 위해서입니다. 이메일은 사이트에서 스팸 수집기를 피해 가려 둔 값이라 구조화 데이터에 넣지 않았습니다. `knowsAbout` 은 카드 techStack 순서대로 뽑으면 백엔드 항목이 앞을 채우고 React 가 빠졌습니다. 이력서 스킬로 고정했다가, 그중 화면 어디에도 없는 두 개(TanStack Query, JavaScript)를 빼고 화면에 보이는 8개만 남겼습니다. 구조화 데이터에는 화면에 있는 것만 적는다는 원칙 때문입니다.
+
+검색엔진 등록은 2026-11-24 에 했습니다. 구글 서치 콘솔은 `sejunb.com` 도메인 속성을 DNS TXT 로 확인해서 `lucky.sejunb.com`(명당재팬)까지 한 속성으로 묶였고, 사이트맵을 제출했습니다. 네이버 서치어드바이저는 메타 태그로 확인합니다.
